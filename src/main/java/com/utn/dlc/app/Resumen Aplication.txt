@@ -1,0 +1,2 @@
+Lo que se hace en el aplication es inicializar la aplicacion
+En esta clase se runea la aplicacion

@@ -1,0 +1,2 @@
+La entidad de nuestro objeto ya sea documento o palabra o documento por palabra
+, estas clases van a mapear los atributos como campos en la base de datos

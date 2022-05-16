@@ -1,0 +1,4 @@
+Esta clase nos ayuda a realizar operaciones en nuestra base de datos sin escribir tantas líneas de código, 
+Spring Data realiza esto por nosotros, operaciones como delete, save, findAll, son algunos de los métodos que realiza automáticamente.
+
+Es la capa de acceso a datos

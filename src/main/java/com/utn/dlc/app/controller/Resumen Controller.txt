@@ -1,0 +1,1 @@
+Esta clase le indica a spring que la clase va a ser un controlador de una API Rest, nos proveerá de todos los métodos para un CRUD.
