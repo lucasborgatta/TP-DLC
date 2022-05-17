@@ -18,7 +18,7 @@ public class PalabraController {
     private PalabraRepository palabraRepository;
 
     @PostMapping(path = "/add")
-    public @ResponseBody String addNewPalabra(@RequestParam String nombre, boolean flag){
+    public @ResponseBody String addNewPalabra(@RequestParam String nombre){
 
         Palabra pal= new Palabra();
         pal.setNombre(nombre);
