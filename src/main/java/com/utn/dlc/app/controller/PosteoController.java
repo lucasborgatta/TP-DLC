@@ -32,10 +32,12 @@ public class PosteoController {
         if (posteoRepository.existsById(posteoPKId)) { // Si este posteo ya existe en la tabla lo unico que tenemos que hacer es incrementar en 1 su frecuencia
             Long frecuenciaPosteo = posteo.getFrecuencia();
             posteo.setFrecuencia(frecuenciaPosteo + 1); // Incrementamos en 1 la frecuencia que ya tenia
+            System.out.println("Aumentamos el contador de frecuencias " + nombre_palabra + frecuenciaPosteo + 1);
             posteoRepository.save(posteo); // Guardamos el posteo con la frecuencia aumentada
         }
         else
         {
+            System.out.println("Seteamos el contador de frecuencias " + nombre_palabra);
             posteo.setFrecuencia((long) 1); // Si el posteo no existe seteamos la frecuencia en 1
             posteoRepository.save(posteo); // Guardamos el posteo con la frecuencia inicializada
         }
@@ -57,6 +59,23 @@ public class PosteoController {
         Optional<Posteo> posteo = posteoRepository.findById(posteoPKId);
 
         return posteo;
+    }
+
+    @GetMapping(path = "/cantDoc")
+    public @ResponseBody Integer getCantidadDocumentosById(@RequestParam String nombre_palabra, int cantidadDocumentosTotales) {
+
+        int suma = 0;
+
+        PosteoPKId posteoPKId = new PosteoPKId();
+        posteoPKId.setNombre_palabra(nombre_palabra);
+
+        for (int i = 1; i < cantidadDocumentosTotales; i++) {
+            posteoPKId.setId((long) i);
+            if (posteoRepository.existsById(posteoPKId)) {
+                suma ++;
+            }
+        }
+        return suma;
     }
 
     @DeleteMapping(path = "/delete") // Borra por pk compuesta

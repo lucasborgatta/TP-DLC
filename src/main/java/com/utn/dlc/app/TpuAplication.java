@@ -15,10 +15,10 @@ public class TpuAplication {
 
 	public static void main(String[] args) throws Exception {
 		SpringApplication.run(TpuAplication.class, args);
-		/*
+
 		Index in = new Index();
 		in.index();
-		*/
+
 	}
 
 }

@@ -25,11 +25,14 @@ public class PalabraController {
 
         if (palabraRepository.existsById(nombre)) {
             int cantidadDocumentos = pal.getCantDocumentos();
+            System.out.println("Actualizando el contador de la palabra " + nombre);
             pal.setCantDocumentos(cantidadDocumentos + 1);
+            System.out.println("Contador actualizado " + cantidadDocumentos + 1);
             palabraRepository.save(pal);
         }
         else
         {
+            System.out.println("Contador de la palabra creado " + nombre);
             pal.setCantDocumentos(1);
             palabraRepository.save(pal);
         }

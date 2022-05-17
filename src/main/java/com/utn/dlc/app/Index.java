@@ -2,6 +2,7 @@ package com.utn.dlc.app;
 
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpRequest;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -17,29 +18,39 @@ import java.util.*;
 public class Index {
 
     public void index() throws IOException {
-        File folder = new File("D:\\opt\\Facu\\DLC\\TP\\src\\main\\resources\\Prueba");
-        int contador = 0;
+        File folder = new File("C:\\» Universidad\\DLC\\TP\\src\\main\\resources\\Prueba");
+        int contadorDocumentos = 0;
         ArrayList<String> stopWords = stopWords();
         for (File file : folder.listFiles()) {
-            this.sendPostDocumento(contador, file.getName());
+            this.sendPostDocumento(contadorDocumentos, file.getName());
             String linea;
             String palabra;
             BufferedReader br = new BufferedReader(new FileReader(file));
-            linea = br.readLine();
+
+            // while ((line = br.readLine()) != null) { Si no anda lo de abajo usar esto
+            linea = br.readLine(); // PROBAR ESTO, SI NO CAMBIARLO PARA QUE LEA TODAS LAS LINEAS
+
             StringTokenizer st = new StringTokenizer(linea, " \n1234567890.,;:!?-_\"()[]{}¡¿#$%&/=*-+*|°¬@");
             while (st.hasMoreTokens()) {
-                palabra = st.nextToken();
-                if (!stopWords.contains(palabra)){
-                    sendPostPalabras(palabra, false);
-                }
 
+                palabra = st.nextToken();
+
+                if (!stopWords.contains(palabra)){ // Controlamos que la palabra no sea una stop word del diccionario
+
+                    // Guarda la palabra en la base
+                    sendPostPalabras(palabra, false);
+
+                    // Guarda el documento en la base
+                    sendPostPosteos(contadorDocumentos, palabra);
+                }
             }
-            contador++;
+
+            contadorDocumentos++;
         }
     }
 
     public ArrayList<String> stopWords() throws IOException {
-        File file = new File("D:\\opt\\Facu\\DLC\\TP\\src\\main\\resources\\stop_words_spanish.txt");
+        File file = new File("C:\\» Universidad\\DLC\\TP\\src\\main\\resources\\stop_words_spanish.txt");
         ArrayList<String> words = new ArrayList<String>();
         BufferedReader br = new BufferedReader(new FileReader(file));
 
@@ -64,10 +75,13 @@ public class Index {
 
         HttpGet request = new HttpGet("http://localhost:8080/documentos/all");
 
+
         // Esto se agrega cunado necesitamos pasar los parametros (los del postman)
         //request.addHeader("id", "444");
 
         try (CloseableHttpResponse response = httpClient.execute(request)) {
+
+            HttpGet request2 = new HttpGet("http://localhost:8080/documentos/all");
 
             System.out.println(response.getStatusLine().toString());
 
@@ -107,6 +121,21 @@ public class Index {
         List<BasicNameValuePair> urlParameters = new ArrayList<>();
         urlParameters.add(new BasicNameValuePair("nombre", nombrePalabra));
         urlParameters.add(new BasicNameValuePair("flag", Boolean.toString(flag)));
+        post.setEntity(new UrlEncodedFormEntity(urlParameters));
+
+        try (CloseableHttpClient httpClient = HttpClients.createDefault();
+             CloseableHttpResponse response = httpClient.execute(post)) {
+
+            System.out.println(EntityUtils.toString(response.getEntity()));
+        }
+    }
+
+    public static void sendPostPosteos(int contador, String nombreDoc) throws IOException {
+        HttpPost post = new HttpPost("http://localhost:8080/posteos/add");
+        List<BasicNameValuePair> urlParameters = new ArrayList<>();
+        urlParameters.add(new BasicNameValuePair("id", Integer.toString(contador)));
+        urlParameters.add(new BasicNameValuePair("nombre", nombreDoc));
+
         post.setEntity(new UrlEncodedFormEntity(urlParameters));
 
         try (CloseableHttpClient httpClient = HttpClients.createDefault();
