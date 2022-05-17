@@ -1,163 +1,51 @@
 package com.utn.dlc.app;
 
+import org.apache.coyote.Request;
+import org.apache.http.Header;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpHeaders;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.util.EntityUtils;
+
 import java.io.*;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.util.*;
 
 public class Index {
+    private CloseableHttpClient httpClient = HttpClients.createDefault();
 
-    HashMap<String, Integer> hashMapPosteoPorDocumento = new HashMap<String, Integer>();
-    HashSet<String> hashSet = new HashSet<>();
-
-    public void index(Connection connection) throws IOException, SQLException {
-
-        long startTime = System.currentTimeMillis();
-
-        File folder = new File("C:\\» Universidad\\DLC\\TP\\src\\main\\resources\\static\\Files");
-        int contadorDocumentos = 0;
+    public void index() throws IOException {
+        File folder = new File("D:\\opt\\Facu\\DLC\\TP\\src\\main\\resources\\Prueba");
+        int contador = 0;
         ArrayList<String> stopWords = stopWords();
-
         for (File file : folder.listFiles()) {
-
-            System.out.println(file.getName());
-
+            this.sendPostDocumento(contador, file.getName());
             String linea;
             String palabra;
-
             BufferedReader br = new BufferedReader(new FileReader(file));
-
-            while ((linea = br.readLine()) != null) {
-
-                StringTokenizer st = new StringTokenizer(linea, " \n1234567890.,;:!?-_\"()[]{}\\¡¿#$%&/=*-+*|°¬@<>;'�\u0015~`\f\u0007\u001A\u001B");
-
-                while (st.hasMoreTokens()) {
-
-                    palabra = st.nextToken().toLowerCase(); // Pasamos todas las palabras a minuscula
-
-                    if (!stopWords.contains(palabra)) { // Controlamos que la palabra no sea una stop word del diccionario
-
-                        // Guardamos en la hash map de los posteos
-                        // Si la hash map ya tenia la palabra, osea que aparecio en el documento entonces aumentamos en 1 el contador de frecuencias
-                        if (hashMapPosteoPorDocumento.containsKey(palabra)) {
-                            int contadorAux = hashMapPosteoPorDocumento.get(palabra);
-                            contadorAux++;
-                            hashMapPosteoPorDocumento.put(palabra, contadorAux);
-                        } else {
-                            // Si la hash map no tenia la palabra, la agregamos y ponemos el contador en 1
-                            hashMapPosteoPorDocumento.put(palabra, 1);
-                        }
-                    }
+            linea = br.readLine();
+            StringTokenizer st = new StringTokenizer(linea, " \n1234567890.,;:!?-_\"()[]{}¡¿#$%&/=*-+*|°¬@");
+            while (st.hasMoreTokens()) {
+                palabra = st.nextToken();
+                if (!stopWords.contains(palabra)) {
+                    sendPostPalabras(palabra, false);
                 }
+
             }
-
-            // Sube el documento a la base, tambien tiene que estar cargado antes para poder subir el posteo
-            postearDocumentos(connection, contadorDocumentos, file.getName());
-
-            // Ahora si subimos el posteo de ese documento
-            postearPosteo(connection, contadorDocumentos, hashMapPosteoPorDocumento);
-
-            contadorDocumentos++;
-
-            // Limpiamos la hashmap para liberar memoria
-            hashMapPosteoPorDocumento.clear();
-            // Mirar si el posteo de posteos no se puede hacer cada 10 documentos si no el numero de llamadas se nos va mucho
+            contador++;
         }
-     }
-
-
-    // La connection que se pasa por parametros es para poder hacer la subida a la base, tiene que estar en el tpu aplicattion si o si, no puede estar aca
-
-    // Este metodo no se usa mas pero lo dejo por si tenemos que sacar algo de aca PERO NO SE USA
-    public void postearPalabras(Connection connection, HashMap<String, Integer> hashMapPalabrasdeTodosLosDocumentos ) throws SQLException {
-
-        String insertPalabras = "INSERT INTO palabras (nombre, cant_documentos) values";
-
-        // Esto es para recorrer los datos de la hashmap
-        Set<String> keyHashMapPalabras = hashMapPalabrasdeTodosLosDocumentos.keySet();
-        Collection<Integer> cantidadDocumentos = hashMapPalabrasdeTodosLosDocumentos.values();
-
-        System.out.println("Cantidad de palabras " + keyHashMapPalabras.size());
-
-        Iterator iteratorPalabra = keyHashMapPalabras.iterator();
-        Iterator iteratorCantidadDocumentos = cantidadDocumentos.iterator();
-
-        for (int j = 0; j < hashMapPalabrasdeTodosLosDocumentos.size(); j++) {
-
-            String values = "";
-
-            // Si esta en la ultima linea hace la query pero sin ponerle la coma al final
-            if (j == hashMapPalabrasdeTodosLosDocumentos.size() - 1) {
-
-                // El iterator Palabra trae la palabra y el iterator cantidad de documentos trae la cantidad de documentos de esa palabra para meter adentro de la query
-                values = " ('" + iteratorPalabra.next() + "'," + iteratorCantidadDocumentos.next() + ") ON DUPLICATE KEY UPDATE cant_documentos = cant_documentos + 1"; // El duplicate key update es para que no salte el error por clave duplicada y actualice los contadores
-
-            } else {
-
-                values = " ('" + iteratorPalabra.next() + "'," + iteratorCantidadDocumentos.next() + "),";
-
-            }
-            // Se arma la query enorme
-            insertPalabras = insertPalabras + values;
-        }
-
-        // Se hace la llamada a la base de datos
-        PreparedStatement statement = connection.prepareStatement(insertPalabras);
-        statement.execute();
-        statement.clearParameters();
-        statement.clearBatch();
     }
-
-    public void postearDocumentos(Connection connection, Integer numeroDocumento, String nombreDocumento) throws SQLException {
-
-        StringBuilder stringBuilder = new StringBuilder("INSERT IGNORE INTO documentos values");
-
-        String insert = "(" + numeroDocumento + ",'" + nombreDocumento + "')";
-
-        stringBuilder.append(insert);
-
-        PreparedStatement statement = connection.prepareStatement(String.valueOf(stringBuilder));
-        statement.execute();
-        statement.clearParameters();
-
-    }
-
-    // Este funciona igual que el de arriba
-    public void postearPosteo(Connection connection, Integer numeroDocumento, HashMap<String, Integer> hashMapPosteoPorDocumento) throws SQLException {
-
-        StringBuilder stringBuilder = new StringBuilder("REPLACE INTO posteos values");
-
-        // "ON DUPLICATE KEY UPDATE frecuencia = frecuencia + 1" Esto lo dejo aca comentado porque nos puede llegar a servir
-
-        Set<String> keyHashMapPosteos = hashMapPosteoPorDocumento.keySet();
-        Collection<Integer> frecuencias = hashMapPosteoPorDocumento.values();
-
-        Iterator iteratorPalabra = keyHashMapPosteos.iterator();
-        Iterator iteratorFrecuencia = frecuencias.iterator();
-
-
-        for (int i = 0; i < hashMapPosteoPorDocumento.size(); i++) {
-
-            if (i == hashMapPosteoPorDocumento.size() - 1) {
-
-                stringBuilder.append("(" + numeroDocumento + ",'" + iteratorPalabra.next() + "'," + iteratorFrecuencia.next() + ")");
-            }
-            else
-            {
-                stringBuilder.append("(" + numeroDocumento + ",'" + iteratorPalabra.next() + "'," + iteratorFrecuencia.next() + "),");
-            }
-        }
-
-        PreparedStatement statement = connection.prepareStatement(String.valueOf(stringBuilder));
-        statement.execute();
-        statement.clearParameters();
-
-    }
-
 
     public ArrayList<String> stopWords() throws IOException {
-        File file = new File("C:\\» Universidad\\DLC\\TP\\src\\main\\resources\\stop_words_english.txt");
+        File file = new File("D:\\opt\\Facu\\DLC\\TP\\src\\main\\resources\\stop_words_spanish.txt");
         ArrayList<String> words = new ArrayList<String>();
         BufferedReader br = new BufferedReader(new FileReader(file));
 
@@ -168,4 +56,110 @@ public class Index {
         return words;
 //        System.out.println(words);
     }
+
+
+    /**
+     * StringTokenizer st = new StringTokenizer(archivo, delimitidador);
+     * <p>
+     * while (st.hasMoreTokens()) {  System.out.println(st.nextToken());
+     */
+
+
+    public static void sendGetDocumento() throws IOException {
+        CloseableHttpClient httpClient = HttpClients.createDefault();
+
+        HttpGet request = new HttpGet("http://localhost:8080/documentos/all");
+
+        // Esto se agrega cunado necesitamos pasar los parametros (los del postman)
+        //request.addHeader("id", "444");
+
+        try (CloseableHttpResponse response = httpClient.execute(request)) {
+
+            System.out.println(response.getStatusLine().toString());
+
+            HttpEntity entity = response.getEntity();
+            Header headers = entity.getContentType();
+            System.out.println(headers);
+
+            if (entity != null) {
+                // return it as a String
+                String result = EntityUtils.toString(entity);
+                System.out.println(result);
+            }
+
+        }
+
+    }
+
+    public void sendPostDocumento(int contador, String nombreDoc) throws IOException {
+        List<BasicNameValuePair> urlParameters = new ArrayList<>();
+        HttpPost post = new HttpPost("http://localhost:8080/documentos/add");
+
+        // Esto se agrega cunado necesitamos pasar los parametros (los del postman)
+        urlParameters.add(new BasicNameValuePair("nombre", nombreDoc));
+        urlParameters.add(new BasicNameValuePair("id", Integer.toString(contador)));
+
+        post.setEntity(new UrlEncodedFormEntity(urlParameters));
+
+        try (CloseableHttpClient httpClient = HttpClients.createDefault();
+             CloseableHttpResponse response = httpClient.execute(post)) {
+
+            System.out.println(EntityUtils.toString(response.getEntity()));
+        }
+    }
+
+    public static void sendPostPalabras(String nombrePalabra, boolean flag) throws IOException {
+        HttpPost post = new HttpPost("http://localhost:8080/palabras/add");
+        List<BasicNameValuePair> urlParameters = new ArrayList<>();
+        urlParameters.add(new BasicNameValuePair("nombre", nombrePalabra));
+        urlParameters.add(new BasicNameValuePair("flag", Boolean.toString(flag)));
+        post.setEntity(new UrlEncodedFormEntity(urlParameters));
+
+        try (CloseableHttpClient httpClient = HttpClients.createDefault();
+             CloseableHttpResponse response = httpClient.execute(post)) {
+
+            System.out.println(EntityUtils.toString(response.getEntity()));
+        }
+    }
+
+    public void getPalabraById() throws IOException {
+        HttpClient client = HttpClientBuilder.create().build();
+        HttpGet request = new HttpGet("http://localhost:8080/palabras/id");
+        request.addHeader("nombre", "bancamos");
+
+        try {
+            HttpResponse response = client.execute(request);
+            HttpEntity entity = response.getEntity();
+            if (entity != null) {
+                try (InputStream stream = entity.getContent()) {
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        System.out.println(line);
+                    }
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+//        HttpGet request = new HttpGet("http://localhost:8080/palabras/id");
+//        request.addHeader("nombre", "bancamos");
+//        request.addHeader(HttpHeaders.USER_AGENT, "Googlebot");
+//
+//        try (CloseableHttpResponse response = httpClient.execute(request)){
+//            System.out.println(response.getStatusLine().toString());
+//
+//            HttpEntity entity = response.getEntity();
+//            Header headers = entity.getContentType();
+//            System.out.println(headers);
+//
+//            if (entity != null){
+//                String result = EntityUtils.toString(entity);
+//                InputStream stream = entity.getContent();
+//                InputStreamReader reader = new InputStreamReader(stream);
+//                System.out.println(reader.toString());
+//            }
+//        }
+    }
+
 }
