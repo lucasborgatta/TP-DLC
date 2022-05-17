@@ -20,6 +20,8 @@ public class PosteoController {
     public @ResponseBody
     String addNewPosteo(@RequestParam Long id_documento, String nombre_palabra) {
 
+        System.out.println("Posteo paso 2");
+
         Posteo posteo = new Posteo();
         posteo.setId_documento(id_documento);
         posteo.setNombre_palabra(nombre_palabra);
@@ -41,7 +43,10 @@ public class PosteoController {
             posteo.setFrecuencia((long) 1); // Si el posteo no existe seteamos la frecuencia en 1
             posteoRepository.save(posteo); // Guardamos el posteo con la frecuencia inicializada
         }
-        return "Saved";
+
+        System.out.println("Posteo paso 3");
+
+        return "Posteo Saved";
     }
 
     @GetMapping(path = "/all") // Todos

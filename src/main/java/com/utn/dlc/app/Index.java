@@ -1,5 +1,6 @@
 package com.utn.dlc.app;
 
+import jdk.swing.interop.SwingInterOpUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpRequest;
@@ -27,24 +28,27 @@ public class Index {
             String palabra;
             BufferedReader br = new BufferedReader(new FileReader(file));
 
-            // while ((line = br.readLine()) != null) { Si no anda lo de abajo usar esto
-            linea = br.readLine(); // PROBAR ESTO, SI NO CAMBIARLO PARA QUE LEA TODAS LAS LINEAS
+            while ((linea = br.readLine()) != null) {
+                StringTokenizer st = new StringTokenizer(linea, " \n1234567890.,;:!?-_\"()[]{}¡¿#$%&/=*-+*|°¬@");
+                while (st.hasMoreTokens()) {
 
-            StringTokenizer st = new StringTokenizer(linea, " \n1234567890.,;:!?-_\"()[]{}¡¿#$%&/=*-+*|°¬@");
-            while (st.hasMoreTokens()) {
+                    palabra = st.nextToken();
 
-                palabra = st.nextToken();
+                    System.out.println("DOCUMENTO Y PALABRA");
+                    System.out.println(file.getName());
+                    System.out.println(palabra);
+                    System.out.println("");
 
-                if (!stopWords.contains(palabra)){ // Controlamos que la palabra no sea una stop word del diccionario
+                    if (!stopWords.contains(palabra)){ // Controlamos que la palabra no sea una stop word del diccionario
 
-                    // Guarda la palabra en la base
-                    sendPostPalabras(palabra, false);
+                        // Guarda la palabra en la base
+                        sendPostPalabras(palabra, false);
 
-                    // Guarda el documento en la base
-                    sendPostPosteos(contadorDocumentos, palabra);
+                        // Guarda el documento en la base
+                        sendPostPosteos(contadorDocumentos, palabra);
+                    }
                 }
             }
-
             contadorDocumentos++;
         }
     }
@@ -131,6 +135,7 @@ public class Index {
     }
 
     public static void sendPostPosteos(int contador, String nombreDoc) throws IOException {
+        System.out.println("Posteo paso 1");
         HttpPost post = new HttpPost("http://localhost:8080/posteos/add");
         List<BasicNameValuePair> urlParameters = new ArrayList<>();
         urlParameters.add(new BasicNameValuePair("id", Integer.toString(contador)));

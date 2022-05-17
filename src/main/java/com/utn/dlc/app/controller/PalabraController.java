@@ -20,9 +20,6 @@ public class PalabraController {
     @PostMapping(path = "/add")
     public @ResponseBody String addNewPalabra(@RequestParam String nombre, boolean flag){
 
-        Palabra pal= new Palabra();
-        pal.setNombre(nombre);
-
         if (palabraRepository.existsById(nombre)) {
             int cantidadDocumentos = pal.getCantDocumentos();
             System.out.println("Actualizando el contador de la palabra " + nombre);
