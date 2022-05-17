@@ -18,13 +18,24 @@ public class PalabraController {
     private PalabraRepository palabraRepository;
 
     @PostMapping(path = "/add")
-    public @ResponseBody void addNewPalabra(@RequestParam String nombre){
+    public @ResponseBody String addNewPalabra(@RequestParam String nombre){
 
-        Palabra palabra = new Palabra();
-        palabra.setNombre(nombre);
+        Palabra pal= new Palabra();
+        pal.setNombre(nombre);
 
-        palabraRepository.save(palabra);
-        //return "Saved";
+        if (palabraRepository.existsById(nombre)) {
+            int cantidadDocumentos = pal.getCantDocumentos();
+            pal.setCantDocumentos(cantidadDocumentos + 1);
+            palabraRepository.save(pal);
+        }
+        else
+        {
+            pal.setCantDocumentos(1);
+            palabraRepository.save(pal);
+        }
+
+        palabraRepository.save(pal);
+        return "Saved";
     }
 
     @GetMapping(path= "/all")
@@ -39,24 +50,13 @@ public class PalabraController {
     }
 
     @DeleteMapping(path = "/delete")
-    public @ResponseBody void deleteByID(@RequestParam String nombre){
+    public @ResponseBody String deleteByID(@RequestParam String nombre){
 
         if (palabraRepository.existsById(nombre)) {
             palabraRepository.deleteById(nombre);
-            //return "Deleted";
+            return "Deleted";
         }
-        //else
-            //return "404 Not Found";
-    }
-
-    @PutMapping(path = "/put")
-    public @ResponseBody void putPalabra(@RequestParam String nombre, int cantidadDocumentos){
-
-        Palabra palabra = new Palabra();
-        palabra.setNombre(nombre);
-        palabra.setCantDocumentos(cantidadDocumentos);
-
-        palabraRepository.saveAndFlush(palabra);
-        //return "Saved";
+        else
+            return "404 Not Found";
     }
 }
