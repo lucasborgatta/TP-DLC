@@ -1,18 +1,20 @@
 package com.utn.dlc.app;
 
-import jdk.swing.interop.SwingInterOpUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
-import org.apache.http.HttpRequest;
+import org.apache.http.ParseException;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 
+import javax.imageio.IIOException;
 import java.io.*;
 import java.util.*;
 
@@ -22,6 +24,8 @@ public class Index {
         File folder = new File("C:\\» Universidad\\DLC\\TP\\src\\main\\resources\\Prueba");
         int contadorDocumentos = 0;
         ArrayList<String> stopWords = stopWords();
+
+        HashMap<String, Integer> aparicionDocumentos = new HashMap<>();
 
 
         for (File file : folder.listFiles()) {
@@ -42,11 +46,6 @@ public class Index {
                 while (st.hasMoreTokens()) {
 
                     palabra = st.nextToken();
-
-                    System.out.println("DOCUMENTO Y PALABRA");
-                    System.out.println(file.getName());
-                    System.out.println(palabra);
-                    System.out.println("");
 
                     if (!stopWords.contains(palabra)){ // Controlamos que la palabra no sea una stop word del diccionario
 
@@ -77,20 +76,27 @@ public class Index {
             Set<String> keyHashMap = palabraPorDoc.keySet();
             Collection<Integer> values = palabraPorDoc.values();
 
-            System.out.println(palabraPorDoc);
-            System.out.println(keyHashMap);
-            System.out.println(values);
-
             Iterator iteratorKey = keyHashMap.iterator();
             Iterator iteratorValue = values.iterator();
 
             while (iteratorKey.hasNext()) {
+
                 String key = String.valueOf(iteratorKey.next());
-                String value = String.valueOf(iteratorValue.next());
-                System.out.println("");
-                System.out.println("En el documento " + contadorDocumentos + " con el nombre " + file.getName());
-                System.out.println("La palabra " + key);
-                System.out.println("Aparece " + value + " veces ");
+                int value = Integer.parseInt(String.valueOf(iteratorValue.next()));
+
+                sendPutPosteosFrecuencia((long) contadorDocumentos, key, value);
+
+                if (aparicionDocumentos.containsKey(key)) {
+                    int contadorAux = aparicionDocumentos.get(key);
+                    contadorAux++;
+                    aparicionDocumentos.put(key, contadorAux);
+                }
+                else
+                {
+                    aparicionDocumentos.put(key, 1);
+                }
+
+
             }
 
             /*
@@ -104,6 +110,21 @@ public class Index {
 
             contadorDocumentos++;
         }
+
+        Set<String> keyHashMap = aparicionDocumentos.keySet();
+        Collection<Integer> values = aparicionDocumentos.values();
+
+        Iterator iteradorPalabras = keyHashMap.iterator();
+        Iterator iteradorValues = values.iterator();
+
+        while (iteradorPalabras.hasNext()) {
+
+            String key = String.valueOf(iteradorPalabras.next());
+            int value = Integer.parseInt(String.valueOf(iteradorValues.next()));
+
+            sendPutPalabras(key, value);
+        }
+
     }
 
     /*
@@ -218,8 +239,27 @@ public class Index {
         }
     }
 
+    public static void sendPutPalabras(String nombrePalabra, int cantidadDocumentos) throws IOException {
+        HttpPut put = new HttpPut("http://localhost:8080/palabras/put");
+        List<BasicNameValuePair> urlParameters = new ArrayList<>();
+        urlParameters.add(new BasicNameValuePair("nombre", nombrePalabra));
+        urlParameters.add(new BasicNameValuePair("cantidadDocumentos", Integer.toString(cantidadDocumentos)));
+        put.setEntity(new UrlEncodedFormEntity(urlParameters));
+
+        try {
+            CloseableHttpClient closeableHttpClient = HttpClients.createDefault();
+            CloseableHttpResponse response = closeableHttpClient.execute(put);
+
+            System.out.println(EntityUtils.toString(response.getEntity()));
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+    }
+
+
     public static void sendPostPosteos(int contador, String nombreDoc) throws IOException {
-        System.out.println("Posteo paso 1");
         HttpPost post = new HttpPost("http://localhost:8080/posteos/add");
         List<BasicNameValuePair> urlParameters = new ArrayList<>();
         urlParameters.add(new BasicNameValuePair("id_documento", Integer.toString(contador)));
@@ -233,5 +273,28 @@ public class Index {
             System.out.println(EntityUtils.toString(response.getEntity()));
         }
     }
+
+    public static void sendPutPosteosFrecuencia(Long id_Documento, String nombrePalabra, int frecuencia) throws IIOException, UnsupportedEncodingException {
+        HttpPut put = new HttpPut("http://localhost:8080/posteos/updateFrecuencia");
+        List<BasicNameValuePair> urlParameters = new ArrayList<>();
+        urlParameters.add(new BasicNameValuePair("id_documento", Long.toString(id_Documento)));
+        urlParameters.add(new BasicNameValuePair("nombre_palabra", nombrePalabra));
+        urlParameters.add(new BasicNameValuePair("frecuencia", Integer.toString(frecuencia)));
+        put.setEntity(new UrlEncodedFormEntity(urlParameters));
+
+        try {
+            CloseableHttpClient httpClient = HttpClients.createDefault();
+            CloseableHttpResponse response = httpClient.execute(put);
+
+            System.out.println(EntityUtils.toString(response.getEntity()));
+
+        } catch (ClientProtocolException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
 
 }

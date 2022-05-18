@@ -20,15 +20,11 @@ public class PosteoController {
     public @ResponseBody
     String addNewPosteo(@RequestParam Long id_documento, String nombre_palabra) {
 
-        System.out.println("Posteo paso 2");
-
         Posteo posteo = new Posteo();
         posteo.setId_documento(id_documento);
         posteo.setNombre_palabra(nombre_palabra);
 
         posteoRepository.save(posteo);
-
-        System.out.println("Posteo paso 3");
 
         return "Posteo Saved";
     }
