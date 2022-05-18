@@ -18,23 +18,12 @@ public class PalabraController {
     private PalabraRepository palabraRepository;
 
     @PostMapping(path = "/add")
-    public @ResponseBody String addNewPalabra(@RequestParam String nombre, boolean flag){
+    public @ResponseBody String addNewPalabra(@RequestParam String nombre){
 
-        if (palabraRepository.existsById(nombre)) {
-            int cantidadDocumentos = pal.getCantDocumentos();
-            System.out.println("Actualizando el contador de la palabra " + nombre);
-            pal.setCantDocumentos(cantidadDocumentos + 1);
-            System.out.println("Contador actualizado " + cantidadDocumentos + 1);
-            palabraRepository.save(pal);
-        }
-        else
-        {
-            System.out.println("Contador de la palabra creado " + nombre);
-            pal.setCantDocumentos(1);
-            palabraRepository.save(pal);
-        }
+        Palabra palabra = new Palabra();
+        palabra.setNombre(nombre);
 
-        palabraRepository.save(pal);
+        palabraRepository.save(palabra);
         return "Saved";
     }
 

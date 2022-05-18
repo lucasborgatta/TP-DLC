@@ -26,23 +26,7 @@ public class PosteoController {
         posteo.setId_documento(id_documento);
         posteo.setNombre_palabra(nombre_palabra);
 
-        // Creamos una instancia de posteoPKId
-        PosteoPKId posteoPKId = new PosteoPKId();
-        posteoPKId.setId(id_documento);
-        posteoPKId.setNombrePalabra(nombre_palabra);
-
-        if (posteoRepository.existsById(posteoPKId)) { // Si este posteo ya existe en la tabla lo unico que tenemos que hacer es incrementar en 1 su frecuencia
-            Long frecuenciaPosteo = posteo.getFrecuencia();
-            posteo.setFrecuencia(frecuenciaPosteo + 1); // Incrementamos en 1 la frecuencia que ya tenia
-            System.out.println("Aumentamos el contador de frecuencias " + nombre_palabra + frecuenciaPosteo + 1);
-            posteoRepository.save(posteo); // Guardamos el posteo con la frecuencia aumentada
-        }
-        else
-        {
-            System.out.println("Seteamos el contador de frecuencias " + nombre_palabra);
-            posteo.setFrecuencia((long) 1); // Si el posteo no existe seteamos la frecuencia en 1
-            posteoRepository.save(posteo); // Guardamos el posteo con la frecuencia inicializada
-        }
+        posteoRepository.save(posteo);
 
         System.out.println("Posteo paso 3");
 

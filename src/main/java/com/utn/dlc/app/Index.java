@@ -22,14 +22,23 @@ public class Index {
         File folder = new File("C:\\» Universidad\\DLC\\TP\\src\\main\\resources\\Prueba");
         int contadorDocumentos = 0;
         ArrayList<String> stopWords = stopWords();
+
+
         for (File file : folder.listFiles()) {
+
+            HashMap<String, Integer> palabraPorDoc = new HashMap<String, Integer>();
+
             this.sendPostDocumento(contadorDocumentos, file.getName());
+
             String linea;
             String palabra;
+
             BufferedReader br = new BufferedReader(new FileReader(file));
 
             while ((linea = br.readLine()) != null) {
+
                 StringTokenizer st = new StringTokenizer(linea, " \n1234567890.,;:!?-_\"()[]{}¡¿#$%&/=*-+*|°¬@");
+
                 while (st.hasMoreTokens()) {
 
                     palabra = st.nextToken();
@@ -41,17 +50,93 @@ public class Index {
 
                     if (!stopWords.contains(palabra)){ // Controlamos que la palabra no sea una stop word del diccionario
 
+                        // Guardamos en la hash map
+                        // Si la hash map ya tenia la palabra, osea que aparecio en el documento entonces aumentamos en 1 el contador de frecuencias
+                        if (palabraPorDoc.containsKey(palabra)) {
+                            int contadorAux = palabraPorDoc.get(palabra);
+                            contadorAux ++;
+                            palabraPorDoc.put(palabra, contadorAux);
+                        }
+                        else
+                        {
+                            // Si la hash map no tenia la palabra, la agregamos y ponemos el contador en 1
+                            palabraPorDoc.put(palabra, 1);
+                        }
+
                         // Guarda la palabra en la base
-                        sendPostPalabras(palabra, false);
+                        sendPostPalabras(palabra);
 
                         // Guarda el documento en la base
                         sendPostPosteos(contadorDocumentos, palabra);
                     }
                 }
             }
+
+            // Aca es cuando se termina de leer todo el documento, entonces aca tenemos que actualizar en las tablas de la base lo que nos dio la hash map
+
+            Set<String> keyHashMap = palabraPorDoc.keySet();
+            Collection<Integer> values = palabraPorDoc.values();
+
+            System.out.println(palabraPorDoc);
+            System.out.println(keyHashMap);
+            System.out.println(values);
+
+            Iterator iteratorKey = keyHashMap.iterator();
+            Iterator iteratorValue = values.iterator();
+
+            while (iteratorKey.hasNext()) {
+                String key = String.valueOf(iteratorKey.next());
+                String value = String.valueOf(iteratorValue.next());
+                System.out.println("");
+                System.out.println("En el documento " + contadorDocumentos + " con el nombre " + file.getName());
+                System.out.println("La palabra " + key);
+                System.out.println("Aparece " + value + " veces ");
+            }
+
+            /*
+            while (keyHashMap.iterator().hasNext()) {
+                System.out.println("Keys");
+                System.out.println(keyHashMap.iterator().next());
+            }
+
+             */
+
+
             contadorDocumentos++;
         }
     }
+
+    /*
+    public void index() throws IOException {
+        File folder = new File("D:\\opt\\Facu\\DLC\\TP\\src\\main\\resources\\Prueba");
+        int contador = 0;
+        boolean flagPalabra = false;
+        HashMap<String, Integer> palabraPorDoc = new HashMap<String, Integer>();
+        ArrayList<String> stopWords = stopWords();
+        stopWords = stopWords();
+
+
+        for (File file : folder.listFiles()) {
+            this.sendPostDocumento(contador, file.getName());
+            String linea;
+            String palabra;
+            BufferedReader br = new BufferedReader(new FileReader(file));
+
+            while ((linea = br.readLine()) != null) {
+                StringTokenizer st = new StringTokenizer(linea, " \n1234567890.,;:!?-_\"()[]{}¡¿#$%&/=*-+*|°¬@");
+                while (st.hasMoreTokens()) {
+                    palabra = st.nextToken();
+                    if (!stopWords.contains(palabra)) {
+                        sendPostPalabras(palabra, flagPalabra);
+                        flagPalabra = true;
+                    }
+                contador++;
+                flagPalabra = false;
+            }
+        }
+    }
+     */
+
 
     public ArrayList<String> stopWords() throws IOException {
         File file = new File("C:\\» Universidad\\DLC\\TP\\src\\main\\resources\\stop_words_spanish.txt");
@@ -120,11 +205,10 @@ public class Index {
         }
     }
 
-    public static void sendPostPalabras(String nombrePalabra, boolean flag) throws IOException {
+    public static void sendPostPalabras(String nombrePalabra) throws IOException {
         HttpPost post = new HttpPost("http://localhost:8080/palabras/add");
         List<BasicNameValuePair> urlParameters = new ArrayList<>();
         urlParameters.add(new BasicNameValuePair("nombre", nombrePalabra));
-        urlParameters.add(new BasicNameValuePair("flag", Boolean.toString(flag)));
         post.setEntity(new UrlEncodedFormEntity(urlParameters));
 
         try (CloseableHttpClient httpClient = HttpClients.createDefault();
@@ -138,8 +222,8 @@ public class Index {
         System.out.println("Posteo paso 1");
         HttpPost post = new HttpPost("http://localhost:8080/posteos/add");
         List<BasicNameValuePair> urlParameters = new ArrayList<>();
-        urlParameters.add(new BasicNameValuePair("id", Integer.toString(contador)));
-        urlParameters.add(new BasicNameValuePair("nombre", nombreDoc));
+        urlParameters.add(new BasicNameValuePair("id_documento", Integer.toString(contador)));
+        urlParameters.add(new BasicNameValuePair("nombre_palabra", nombreDoc));
 
         post.setEntity(new UrlEncodedFormEntity(urlParameters));
 
