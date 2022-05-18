@@ -19,7 +19,7 @@ public class TpuAplication {
 	public static void main(String[] args) throws Exception {
 		SpringApplication.run(TpuAplication.class, args);
 		Index index = new Index();
-		index.getPalabraById();
+		index.getPalabraById("bancamos");
 	}
 
 }
