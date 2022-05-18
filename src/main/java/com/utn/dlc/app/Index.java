@@ -113,13 +113,13 @@ public class Index {
     public void sendPostPalabras(String nombrePalabra, boolean flag) throws IOException {
         HttpPost post = new HttpPost("http://localhost:8080/palabras/add");
         List<BasicNameValuePair> urlParameters = new ArrayList<>();
-        ArrayList<String> getPalabra = new ArrayList<String>();
+        ArrayList<String> getPalabra;
 
         if (Objects.nonNull(getPalabraById(nombrePalabra))) {
             getPalabra = getPalabraById(nombrePalabra);
             if (flag == false) {
                 int contadorPalabra = Integer.parseInt(getPalabra.get(1));
-                sendPutPalabra(nombrePalabra, contadorPalabra+1);
+                sendPutPalabra(nombrePalabra, contadorPalabra + 1);
             }
 
         } else {
