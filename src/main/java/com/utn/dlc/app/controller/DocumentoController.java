@@ -1,6 +1,7 @@
 package com.utn.dlc.app.controller;
 
 import com.utn.dlc.app.entity.Documento;
+import com.utn.dlc.app.entity.Palabra;
 import com.utn.dlc.app.repository.DocumentoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -48,8 +49,12 @@ public class DocumentoController {
 			return "404 Not Found";
 	}
 
-	@GetMapping(path = "/risas")
-	public @ResponseBody String risas(@RequestParam Long id){
-		return documentoRepository.findByIdWithQuery(id);
+	@PutMapping(path = "/put")
+	public @ResponseBody String putDocumento(@RequestParam Long id, String nombre){
+		Documento doc = new Documento();
+		doc.setId(id);
+		doc.setNombre(nombre);
+		documentoRepository.saveAndFlush(doc);
+		return "Saved";
 	}
 }
