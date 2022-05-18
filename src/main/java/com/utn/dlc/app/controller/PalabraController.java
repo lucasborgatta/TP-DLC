@@ -18,22 +18,10 @@ public class PalabraController {
     private PalabraRepository palabraRepository;
 
     @PostMapping(path = "/add")
-    public @ResponseBody String addNewPalabra(@RequestParam String nombre){
-
+    public @ResponseBody String addNewPalabra(@RequestParam String nombre, int cant_documentos){
         Palabra pal= new Palabra();
         pal.setNombre(nombre);
-
-        if (palabraRepository.existsById(nombre)) {
-            int cantidadDocumentos = pal.getCantDocumentos();
-            pal.setCantDocumentos(cantidadDocumentos + 1);
-            palabraRepository.save(pal);
-        }
-        else
-        {
-            pal.setCantDocumentos(1);
-            palabraRepository.save(pal);
-        }
-
+        pal.setCantDocumentos(cant_documentos);
         palabraRepository.save(pal);
         return "Saved";
     }
@@ -58,5 +46,14 @@ public class PalabraController {
         }
         else
             return "404 Not Found";
+    }
+
+    @PutMapping(path = "/put")
+    public @ResponseBody String putPalabra(@RequestParam String nombre, int cant_documentos){
+        Palabra pal = new Palabra();
+        pal.setNombre(nombre);
+        pal.setCantDocumentos(cant_documentos);
+        palabraRepository.saveAndFlush(pal);
+        return "Saved";
     }
 }
