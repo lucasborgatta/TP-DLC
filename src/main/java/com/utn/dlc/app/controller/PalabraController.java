@@ -48,4 +48,13 @@ public class PalabraController {
         else
             return "404 Not Found";
     }
+
+    @PutMapping(path = "/put")
+    public @ResponseBody String putPalabra(@RequestParam String nombre, int cant_documentos){
+        Palabra pal = new Palabra();
+        pal.setNombre(nombre);
+        pal.setCantDocumentos(cant_documentos);
+        palabraRepository.saveAndFlush(pal);
+        return "Saved";
+    }
 }
