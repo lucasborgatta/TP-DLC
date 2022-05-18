@@ -23,10 +23,8 @@ public class PosteoController {
         Posteo posteo = new Posteo();
         posteo.setId_documento(id_documento);
         posteo.setNombre_palabra(nombre_palabra);
-
         posteoRepository.save(posteo);
-
-        return "Posteo Saved";
+        return "Saved";
     }
 
     @GetMapping(path = "/all") // Todos
@@ -44,23 +42,6 @@ public class PosteoController {
         Optional<Posteo> posteo = posteoRepository.findById(posteoPKId);
 
         return posteo;
-    }
-
-    @GetMapping(path = "/cantDoc")
-    public @ResponseBody Integer getCantidadDocumentosById(@RequestParam String nombre_palabra, int cantidadDocumentosTotales) {
-
-        int suma = 0;
-
-        PosteoPKId posteoPKId = new PosteoPKId();
-        posteoPKId.setNombre_palabra(nombre_palabra);
-
-        for (int i = 1; i < cantidadDocumentosTotales; i++) {
-            posteoPKId.setId((long) i);
-            if (posteoRepository.existsById(posteoPKId)) {
-                suma ++;
-            }
-        }
-        return suma;
     }
 
     @DeleteMapping(path = "/delete") // Borra por pk compuesta
@@ -128,6 +109,8 @@ public class PosteoController {
 
         return "Updated";
     }
+
+
 }
 
 
