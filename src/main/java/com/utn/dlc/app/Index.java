@@ -28,12 +28,16 @@ public class Index {
         int contadorDocumentos = 0;
         ArrayList<String> stopWords = stopWords();
 
-        HashMap<String, Integer> aparicionDocumentos = new HashMap<>();
+        HashMap<String, Integer> hashMapPalabrasdeTodosLosDocumentos = new HashMap<>();
+        HashMap<String, Integer> hashMapPosteoPorDocumento = new HashMap<String, Integer>();
 
+        Set<String> keyHashMapPosteos;
+        Collection<Integer> frecuencias;
+
+        Set<String> keyHashMapPalabras;
+        Collection<Integer> cantidadDocumentos;
 
         for (File file : folder.listFiles()) {
-
-            HashMap<String, Integer> palabraPorDoc = new HashMap<String, Integer>();
 
             this.sendPostDocumento(contadorDocumentos, file.getName());
 
@@ -54,15 +58,15 @@ public class Index {
 
                         // Guardamos en la hash map
                         // Si la hash map ya tenia la palabra, osea que aparecio en el documento entonces aumentamos en 1 el contador de frecuencias
-                        if (palabraPorDoc.containsKey(palabra)) {
-                            int contadorAux = palabraPorDoc.get(palabra);
+                        if (hashMapPosteoPorDocumento.containsKey(palabra)) {
+                            int contadorAux = hashMapPosteoPorDocumento.get(palabra);
                             contadorAux ++;
-                            palabraPorDoc.put(palabra, contadorAux);
+                            hashMapPosteoPorDocumento.put(palabra, contadorAux);
                         }
                         else
                         {
                             // Si la hash map no tenia la palabra, la agregamos y ponemos el contador en 1
-                            palabraPorDoc.put(palabra, 1);
+                            hashMapPosteoPorDocumento.put(palabra, 1);
                         }
 
                         // Guarda la palabra en la base
@@ -76,58 +80,58 @@ public class Index {
 
             // Aca es cuando se termina de leer todo el documento, entonces aca tenemos que actualizar en las tablas de la base lo que nos dio la hash map
 
-            Set<String> keyHashMap = palabraPorDoc.keySet();
-            Collection<Integer> values = palabraPorDoc.values();
+            keyHashMapPosteos = hashMapPosteoPorDocumento.keySet();
+            frecuencias = hashMapPosteoPorDocumento.values();
 
-            Iterator iteratorKey = keyHashMap.iterator();
-            Iterator iteratorValue = values.iterator();
+            Iterator iteratorKey = keyHashMapPosteos.iterator();
+            Iterator iteratorValue = frecuencias.iterator();
 
+            // Actualizamos la tabla de posteos con los datos que leimos del documento
             while (iteratorKey.hasNext()) {
 
-                String key = String.valueOf(iteratorKey.next());
-                int value = Integer.parseInt(String.valueOf(iteratorValue.next()));
+                String palabraKey = String.valueOf(iteratorKey.next());
+                int frecuenciasValue = Integer.parseInt(String.valueOf(iteratorValue.next()));
 
-                sendPutPosteosFrecuencia((long) contadorDocumentos, key, value);
+                sendPutPosteosFrecuencia((long) contadorDocumentos, palabraKey, frecuenciasValue);
 
-                if (aparicionDocumentos.containsKey(key)) {
-                    int contadorAux = aparicionDocumentos.get(key);
+                if (hashMapPalabrasdeTodosLosDocumentos.containsKey(palabraKey)) {
+                    int contadorAux = hashMapPalabrasdeTodosLosDocumentos.get(palabraKey);
                     contadorAux++;
-                    aparicionDocumentos.put(key, contadorAux);
+                    hashMapPalabrasdeTodosLosDocumentos.put(palabraKey, contadorAux);
                 }
                 else
                 {
-                    aparicionDocumentos.put(key, 1);
+                    hashMapPalabrasdeTodosLosDocumentos.put(palabraKey, 1);
                 }
-
-
             }
 
-            /*
-            while (keyHashMap.iterator().hasNext()) {
-                System.out.println("Keys");
-                System.out.println(keyHashMap.iterator().next());
-            }
-
-             */
-
+            // Borramos la HashMap de posteos
+            keyHashMapPosteos.clear();
+            frecuencias.clear();
 
             contadorDocumentos++;
+            hashMapPosteoPorDocumento.clear();
         }
 
-        Set<String> keyHashMap = aparicionDocumentos.keySet();
-        Collection<Integer> values = aparicionDocumentos.values();
+        keyHashMapPalabras = hashMapPalabrasdeTodosLosDocumentos.keySet();
+        cantidadDocumentos = hashMapPalabrasdeTodosLosDocumentos.values();
 
-        Iterator iteradorPalabras = keyHashMap.iterator();
-        Iterator iteradorValues = values.iterator();
+        Iterator iteradorPalabras = keyHashMapPalabras.iterator();
+        Iterator iteradorValues = cantidadDocumentos.iterator();
 
+        // Actualizamos la tabla palabras con los datos que leimos de todos los documentos
         while (iteradorPalabras.hasNext()) {
 
-            String key = String.valueOf(iteradorPalabras.next());
-            int value = Integer.parseInt(String.valueOf(iteradorValues.next()));
+            String palabrasKey = String.valueOf(iteradorPalabras.next());
+            int cantidadDocumentoValue = Integer.parseInt(String.valueOf(iteradorValues.next()));
 
-            sendPutPalabras(key, value);
+            sendPutPalabras(palabrasKey, cantidadDocumentoValue);
         }
 
+
+        // Borramos la HashMap de palabras
+        keyHashMapPalabras.clear();
+        cantidadDocumentos.clear();
     }
 
     public ArrayList<String> getPalabraById(String value) {
@@ -192,10 +196,6 @@ public class Index {
 
         HttpGet request = new HttpGet("http://localhost:8080/documentos/all");
 
-
-        // Esto se agrega cunado necesitamos pasar los parametros (los del postman)
-        //request.addHeader("id", "444");
-
         try (CloseableHttpResponse response = httpClient.execute(request)) {
 
             HttpGet request2 = new HttpGet("http://localhost:8080/documentos/all");
@@ -211,9 +211,7 @@ public class Index {
                 String result = EntityUtils.toString(entity);
                 System.out.println(result);
             }
-
         }
-
     }
 
     public void sendPostDocumento(int contador, String nombreDoc) throws IOException {
