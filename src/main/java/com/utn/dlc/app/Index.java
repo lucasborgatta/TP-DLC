@@ -2,14 +2,17 @@ package com.utn.dlc.app;
 
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
 import org.apache.http.ParseException;
 import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
@@ -127,36 +130,40 @@ public class Index {
 
     }
 
-    /*
-    public void index() throws IOException {
-        File folder = new File("D:\\opt\\Facu\\DLC\\TP\\src\\main\\resources\\Prueba");
-        int contador = 0;
-        boolean flagPalabra = false;
-        HashMap<String, Integer> palabraPorDoc = new HashMap<String, Integer>();
-        ArrayList<String> stopWords = stopWords();
-        stopWords = stopWords();
+    public ArrayList<String> getPalabraById(String value) {
+        HttpClient client = HttpClientBuilder.create().build();
+        String url = "http://localhost:8080/palabras/id?nombre=" + value;
+        HttpGet get = new HttpGet(url);
+        ArrayList<String> getResponse = new ArrayList<String>();
+        //List<BasicNameValuePair> urlParameters = new ArrayList<>();
+        //urlParameters.add(new BasicNameValuePair("nombre", "bancamos"));
+        //request.setHeader("nombre", "bancamos");
 
-
-        for (File file : folder.listFiles()) {
-            this.sendPostDocumento(contador, file.getName());
-            String linea;
-            String palabra;
-            BufferedReader br = new BufferedReader(new FileReader(file));
-
-            while ((linea = br.readLine()) != null) {
-                StringTokenizer st = new StringTokenizer(linea, " \n1234567890.,;:!?-_\"()[]{}¡¿#$%&/=*-+*|°¬@");
-                while (st.hasMoreTokens()) {
-                    palabra = st.nextToken();
-                    if (!stopWords.contains(palabra)) {
-                        sendPostPalabras(palabra, flagPalabra);
-                        flagPalabra = true;
+        try {
+            HttpResponse response = client.execute(get);
+            HttpEntity entity = response.getEntity();
+            if (entity != null) {
+                try (InputStream stream = entity.getContent()) {
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
+                    String line;
+                    String palabra;
+                    while ((line = reader.readLine()) != null) {
+                        StringTokenizer st = new StringTokenizer(line, " \n:,\"{}");
+                        while (st.hasMoreTokens()) {
+                            palabra = st.nextToken();
+                            if (!(palabra.equals("nombre") || palabra.equals("cantDocumentos"))) {
+                                System.out.println(palabra);
+                                getResponse.add(palabra);
+                            }
+                        }
                     }
-                contador++;
-                flagPalabra = false;
+                }
             }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+        return getResponse;
     }
-     */
 
 
     public ArrayList<String> stopWords() throws IOException {
