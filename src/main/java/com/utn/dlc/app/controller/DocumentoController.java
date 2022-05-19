@@ -48,8 +48,12 @@ public class DocumentoController {
 			return "404 Not Found";
 	}
 
-	@GetMapping(path = "/risas")
-	public @ResponseBody String risas(@RequestParam Long id){
-		return documentoRepository.findByIdWithQuery(id);
+	@PutMapping(path = "/put")
+	public @ResponseBody String putDocumento(@RequestParam Long id, String nombre){
+		Documento doc = new Documento();
+		doc.setId(id);
+		doc.setNombre(nombre);
+		documentoRepository.saveAndFlush(doc);
+		return "Saved";
 	}
 }

@@ -79,32 +79,6 @@ public class PosteoController {
 
     }
 
-    @PutMapping(path = "/update")
-    public @ResponseBody
-    String addPesoPosteo(@RequestParam Long id_documento, String nombre_palabra, Double peso) {
-
-        Posteo posteo = new Posteo();
-        posteo.setId_documento(id_documento);
-        posteo.setNombre_palabra(nombre_palabra);
-
-        // Creamos una instancia de posteoPKId
-        PosteoPKId posteoPKId = new PosteoPKId();
-        posteoPKId.setId(id_documento);
-        posteoPKId.setNombrePalabra(nombre_palabra);
-
-        if (posteoRepository.existsById(posteoPKId)) { // Si este posteo ya existe en la tabla lo unico que tenemos que hacer es incrementar en 1 su frecuencia
-            posteo.setPeso(peso);
-        }
-        else
-        {
-            return "404 Not Found";
-        }
-
-        posteoRepository.save(posteo);
-
-        return "Updated";
-    }
-
     @PutMapping(path = "/updateFrecuencia")
     public @ResponseBody String addFrecuenciaPosteo(@RequestParam Long id_documento, String nombre_palabra, Long frecuencia){
         Posteo posteo = new Posteo();
