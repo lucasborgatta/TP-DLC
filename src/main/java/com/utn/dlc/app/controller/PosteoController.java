@@ -1,17 +1,12 @@
 package com.utn.dlc.app.controller;
 
 
-import com.utn.dlc.app.entity.Documento;
-import com.utn.dlc.app.entity.Palabra;
 import com.utn.dlc.app.entity.Posteo;
 import com.utn.dlc.app.entity.PosteoPKId;
 import com.utn.dlc.app.repository.PosteoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -28,13 +23,10 @@ public class PosteoController {
         Posteo posteo = new Posteo();
         posteo.setId_documento(id_documento);
         posteo.setNombre_palabra(nombre_palabra);
-        posteoRepository.save(posteo);
-        return "Saved";
-    }
 
-    @PostMapping(path = "/add-all")
-    public ResponseEntity<List<Posteo>> addAllPosteos(List<Posteo> posteos){
-        return new ResponseEntity<>(posteoRepository.saveAll(posteos), HttpStatus.OK);
+        posteoRepository.save(posteo);
+
+        return "Posteo Saved";
     }
 
     @GetMapping(path = "/all") // Todos
@@ -52,6 +44,23 @@ public class PosteoController {
         Optional<Posteo> posteo = posteoRepository.findById(posteoPKId);
 
         return posteo;
+    }
+
+    @GetMapping(path = "/cantDoc")
+    public @ResponseBody Integer getCantidadDocumentosById(@RequestParam String nombre_palabra, int cantidadDocumentosTotales) {
+
+        int suma = 0;
+
+        PosteoPKId posteoPKId = new PosteoPKId();
+        posteoPKId.setNombre_palabra(nombre_palabra);
+
+        for (int i = 1; i < cantidadDocumentosTotales; i++) {
+            posteoPKId.setId((long) i);
+            if (posteoRepository.existsById(posteoPKId)) {
+                suma ++;
+            }
+        }
+        return suma;
     }
 
     @DeleteMapping(path = "/delete") // Borra por pk compuesta
@@ -119,8 +128,6 @@ public class PosteoController {
 
         return "Updated";
     }
-
-
 }
 
 

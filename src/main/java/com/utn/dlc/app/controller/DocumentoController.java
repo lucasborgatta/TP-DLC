@@ -19,12 +19,12 @@ public class DocumentoController {
 	private DocumentoRepository documentoRepository;
 
 	@PostMapping(path = "/add")
-	public @ResponseBody String addNewDocument(@RequestParam Long id, String nombre){ // Los nombres que estan aca son los mismos que van en el postman, si no no funciona
+	public @ResponseBody void addNewDocument(@RequestParam Long id, String nombre){ // Los nombres que estan aca son los mismos que van en el postman, si no no funciona
 		Documento doc = new Documento();
 		doc.setNombre(nombre);
 		doc.setId(id);
 		documentoRepository.save(doc);
-		return "Saved";
+		//return "Saved";
 	}
 
 	@GetMapping(path = "/all")
@@ -39,22 +39,22 @@ public class DocumentoController {
 	}
 
 	@DeleteMapping(path = "/delete")
-	public @ResponseBody String deleteDocument(@RequestParam Long id){
+	public @ResponseBody void deleteDocument(@RequestParam Long id){
 
 		if (documentoRepository.existsById(id)) {
 			documentoRepository.deleteById(id);
-			return "Deleted";
+			//return "Deleted";
 		}
-		else
-			return "404 Not Found";
+		//else
+			//return "404 Not Found";
 	}
 
 	@PutMapping(path = "/put")
-	public @ResponseBody String putDocumento(@RequestParam Long id, String nombre){
+	public @ResponseBody void putDocumento(@RequestParam Long id, String nombre){
 		Documento doc = new Documento();
 		doc.setId(id);
 		doc.setNombre(nombre);
 		documentoRepository.saveAndFlush(doc);
-		return "Saved";
+		//return "Saved";
 	}
 }

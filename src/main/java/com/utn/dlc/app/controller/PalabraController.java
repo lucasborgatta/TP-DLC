@@ -18,11 +18,12 @@ public class PalabraController {
     private PalabraRepository palabraRepository;
 
     @PostMapping(path = "/add")
-    public @ResponseBody String addNewPalabra(@RequestParam String nombre, int cant_documentos){
-        Palabra pal= new Palabra();
-        pal.setNombre(nombre);
-        pal.setCantDocumentos(cant_documentos);
-        palabraRepository.save(pal);
+    public @ResponseBody String addNewPalabra(@RequestParam String nombre){
+
+        Palabra palabra = new Palabra();
+        palabra.setNombre(nombre);
+
+        palabraRepository.save(palabra);
         return "Saved";
     }
 
@@ -49,11 +50,13 @@ public class PalabraController {
     }
 
     @PutMapping(path = "/put")
-    public @ResponseBody String putPalabra(@RequestParam String nombre, int cant_documentos){
-        Palabra pal = new Palabra();
-        pal.setNombre(nombre);
-        pal.setCantDocumentos(cant_documentos);
-        palabraRepository.saveAndFlush(pal);
+    public @ResponseBody String putPalabra(@RequestParam String nombre, int cantidadDocumentos){
+
+        Palabra palabra = new Palabra();
+        palabra.setNombre(nombre);
+        palabra.setCantDocumentos(cantidadDocumentos);
+
+        palabraRepository.saveAndFlush(palabra);
         return "Saved";
     }
 }
