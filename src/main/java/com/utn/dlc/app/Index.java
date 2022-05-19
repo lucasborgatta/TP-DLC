@@ -24,16 +24,16 @@ import java.util.*;
 public class Index {
 
     public void index() throws IOException {
-        File folder = new File("C:\\» Universidad\\DLC\\TP\\src\\main\\resources\\Prueba");
+        File folder = new File("C:\\Users\\nahue\\OneDrive\\Documentos\\GitHub\\TP-DLC\\src\\main\\resources\\Prueba");
         int contadorDocumentos = 0;
         ArrayList<String> stopWords = stopWords();
 
         HashMap<String, Integer> aparicionDocumentos = new HashMap<>();
-
+        HashMap<String, Integer> palabraPorDoc = new HashMap<String, Integer>();
+        HashMap<String, Integer> frecuenciasPalabras = new HashMap<>();
 
         for (File file : folder.listFiles()) {
 
-            HashMap<String, Integer> palabraPorDoc = new HashMap<String, Integer>();
 
             this.sendPostDocumento(contadorDocumentos, file.getName());
 
@@ -50,17 +50,15 @@ public class Index {
 
                     palabra = st.nextToken();
 
-                    if (!stopWords.contains(palabra)){ // Controlamos que la palabra no sea una stop word del diccionario
+                    if (!stopWords.contains(palabra)) { // Controlamos que la palabra no sea una stop word del diccionario
 
                         // Guardamos en la hash map
                         // Si la hash map ya tenia la palabra, osea que aparecio en el documento entonces aumentamos en 1 el contador de frecuencias
                         if (palabraPorDoc.containsKey(palabra)) {
                             int contadorAux = palabraPorDoc.get(palabra);
-                            contadorAux ++;
+                            contadorAux++;
                             palabraPorDoc.put(palabra, contadorAux);
-                        }
-                        else
-                        {
+                        } else {
                             // Si la hash map no tenia la palabra, la agregamos y ponemos el contador en 1
                             palabraPorDoc.put(palabra, 1);
                         }
@@ -76,11 +74,11 @@ public class Index {
 
             // Aca es cuando se termina de leer todo el documento, entonces aca tenemos que actualizar en las tablas de la base lo que nos dio la hash map
 
-            Set<String> keyHashMap = palabraPorDoc.keySet();
-            Collection<Integer> values = palabraPorDoc.values();
+            Set<String> keyHashMapPosteo = palabraPorDoc.keySet();
+            Collection<Integer> frecuencias = palabraPorDoc.values();
 
-            Iterator iteratorKey = keyHashMap.iterator();
-            Iterator iteratorValue = values.iterator();
+            Iterator iteratorKey = keyHashMapPosteo.iterator();
+            Iterator iteratorValue = frecuencias.iterator();
 
             while (iteratorKey.hasNext()) {
 
@@ -88,37 +86,26 @@ public class Index {
                 int value = Integer.parseInt(String.valueOf(iteratorValue.next()));
 
                 sendPutPosteosFrecuencia((long) contadorDocumentos, key, value);
+                frecuenciasPalabras.put(key, value);
 
                 if (aparicionDocumentos.containsKey(key)) {
                     int contadorAux = aparicionDocumentos.get(key);
                     contadorAux++;
                     aparicionDocumentos.put(key, contadorAux);
-                }
-                else
-                {
+                } else {
                     aparicionDocumentos.put(key, 1);
                 }
 
-
             }
-
-            /*
-            while (keyHashMap.iterator().hasNext()) {
-                System.out.println("Keys");
-                System.out.println(keyHashMap.iterator().next());
-            }
-
-             */
-
-
             contadorDocumentos++;
+            palabraPorDoc.clear();
         }
 
-        Set<String> keyHashMap = aparicionDocumentos.keySet();
-        Collection<Integer> values = aparicionDocumentos.values();
+        Set<String> keyHashMapPalabras = aparicionDocumentos.keySet();
+        Collection<Integer> cant_documentos = aparicionDocumentos.values();
 
-        Iterator iteradorPalabras = keyHashMap.iterator();
-        Iterator iteradorValues = values.iterator();
+        Iterator iteradorPalabras = keyHashMapPalabras.iterator();
+        Iterator iteradorValues = cant_documentos.iterator();
 
         while (iteradorPalabras.hasNext()) {
 
@@ -127,47 +114,10 @@ public class Index {
 
             sendPutPalabras(key, value);
         }
-
     }
-
-    public ArrayList<String> getPalabraById(String value) {
-        HttpClient client = HttpClientBuilder.create().build();
-        String url = "http://localhost:8080/palabras/id?nombre=" + value;
-        HttpGet get = new HttpGet(url);
-        ArrayList<String> getResponse = new ArrayList<String>();
-        //List<BasicNameValuePair> urlParameters = new ArrayList<>();
-        //urlParameters.add(new BasicNameValuePair("nombre", "bancamos"));
-        //request.setHeader("nombre", "bancamos");
-
-        try {
-            HttpResponse response = client.execute(get);
-            HttpEntity entity = response.getEntity();
-            if (entity != null) {
-                try (InputStream stream = entity.getContent()) {
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
-                    String line;
-                    String palabra;
-                    while ((line = reader.readLine()) != null) {
-                        StringTokenizer st = new StringTokenizer(line, " \n:,\"{}");
-                        while (st.hasMoreTokens()) {
-                            palabra = st.nextToken();
-                            if (!(palabra.equals("nombre") || palabra.equals("cantDocumentos"))) {
-                                System.out.println(palabra);
-                                getResponse.add(palabra);
-                            }
-                        }
-                    }
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return getResponse;
-    }
-
 
     public ArrayList<String> stopWords() throws IOException {
-        File file = new File("C:\\» Universidad\\DLC\\TP\\src\\main\\resources\\stop_words_spanish.txt");
+        File file = new File("C:\\Users\\nahue\\OneDrive\\Documentos\\GitHub\\TP-DLC\\src\\main\\resources\\Prueba\\stop_words_spanish.txt");
         ArrayList<String> words = new ArrayList<String>();
         BufferedReader br = new BufferedReader(new FileReader(file));
 
@@ -301,7 +251,5 @@ public class Index {
             e.printStackTrace();
         }
     }
-
-
 
 }
