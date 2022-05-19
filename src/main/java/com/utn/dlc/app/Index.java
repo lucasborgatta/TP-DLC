@@ -24,6 +24,9 @@ import java.util.*;
 public class Index {
 
     public void index() throws IOException {
+
+        long startTime = System.currentTimeMillis();
+
         File folder = new File("C:\\» Universidad\\DLC\\TP\\src\\main\\resources\\Prueba");
         int contadorDocumentos = 0;
         ArrayList<String> stopWords = stopWords();
@@ -40,6 +43,7 @@ public class Index {
         for (File file : folder.listFiles()) {
 
             this.sendPostDocumento(contadorDocumentos, file.getName());
+            System.out.println("POSTEO DOCUMENTO");
 
             String linea;
             String palabra;
@@ -70,10 +74,11 @@ public class Index {
                         }
 
                         // Guarda la palabra en la base
-                        sendPostPalabras(palabra);
+                        //sendPostPalabras(palabra);
 
                         // Guarda el documento en la base
                         sendPostPosteos(contadorDocumentos, palabra);
+                        System.out.println("POSTEO DE POSTEOS");
                     }
                 }
             }
@@ -124,14 +129,18 @@ public class Index {
 
             String palabrasKey = String.valueOf(iteradorPalabras.next());
             int cantidadDocumentoValue = Integer.parseInt(String.valueOf(iteradorValues.next()));
+            sendPostPalabras(palabrasKey);
+            System.out.println("POSTEO DE PALABRAS");
 
             sendPutPalabras(palabrasKey, cantidadDocumentoValue);
         }
 
-
         // Borramos la HashMap de palabras
         keyHashMapPalabras.clear();
         cantidadDocumentos.clear();
+
+        long endTime = System.currentTimeMillis() - startTime;
+        System.out.println("Tiempo de ejecucion " + endTime);
     }
 
     public ArrayList<String> getPalabraById(String value) {
@@ -227,7 +236,7 @@ public class Index {
         try (CloseableHttpClient httpClient = HttpClients.createDefault();
              CloseableHttpResponse response = httpClient.execute(post)) {
 
-            System.out.println(EntityUtils.toString(response.getEntity()));
+            //System.out.println(EntityUtils.toString(response.getEntity()));
         }
     }
 
@@ -240,7 +249,7 @@ public class Index {
         try (CloseableHttpClient httpClient = HttpClients.createDefault();
              CloseableHttpResponse response = httpClient.execute(post)) {
 
-            System.out.println(EntityUtils.toString(response.getEntity()));
+            //System.out.println(EntityUtils.toString(response.getEntity()));
         }
     }
 
@@ -255,7 +264,7 @@ public class Index {
             CloseableHttpClient closeableHttpClient = HttpClients.createDefault();
             CloseableHttpResponse response = closeableHttpClient.execute(put);
 
-            System.out.println(EntityUtils.toString(response.getEntity()));
+            //System.out.println(EntityUtils.toString(response.getEntity()));
         } catch (IOException e) {
             e.printStackTrace();
         } catch (ParseException e) {
@@ -275,7 +284,7 @@ public class Index {
         try (CloseableHttpClient httpClient = HttpClients.createDefault();
              CloseableHttpResponse response = httpClient.execute(post)) {
 
-            System.out.println(EntityUtils.toString(response.getEntity()));
+            //System.out.println(EntityUtils.toString(response.getEntity()));
         }
     }
 
@@ -291,7 +300,7 @@ public class Index {
             CloseableHttpClient httpClient = HttpClients.createDefault();
             CloseableHttpResponse response = httpClient.execute(put);
 
-            System.out.println(EntityUtils.toString(response.getEntity()));
+            //System.out.println(EntityUtils.toString(response.getEntity()));
 
         } catch (ClientProtocolException e) {
             e.printStackTrace();
