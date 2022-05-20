@@ -18,13 +18,12 @@ public class PalabraController {
     private PalabraRepository palabraRepository;
 
     @PostMapping(path = "/add")
-    public @ResponseBody void addNewPalabra(@RequestParam String nombre){
-
-        Palabra palabra = new Palabra();
-        palabra.setNombre(nombre);
-
-        palabraRepository.save(palabra);
-        //return "Saved";
+    public @ResponseBody String addNewPalabra(@RequestParam String nombre, int cant_documentos){
+        Palabra pal= new Palabra();
+        pal.setNombre(nombre);
+        pal.setCantDocumentos(cant_documentos);
+        palabraRepository.save(pal);
+        return "Saved";
     }
 
     @GetMapping(path= "/all")
@@ -39,24 +38,22 @@ public class PalabraController {
     }
 
     @DeleteMapping(path = "/delete")
-    public @ResponseBody void deleteByID(@RequestParam String nombre){
+    public @ResponseBody String deleteByID(@RequestParam String nombre){
 
         if (palabraRepository.existsById(nombre)) {
             palabraRepository.deleteById(nombre);
-            //return "Deleted";
+            return "Deleted";
         }
-        //else
-            //return "404 Not Found";
+        else
+            return "404 Not Found";
     }
 
     @PutMapping(path = "/put")
-    public @ResponseBody void putPalabra(@RequestParam String nombre, int cantidadDocumentos){
-
-        Palabra palabra = new Palabra();
-        palabra.setNombre(nombre);
-        palabra.setCantDocumentos(cantidadDocumentos);
-
-        palabraRepository.saveAndFlush(palabra);
-        //return "Saved";
+    public @ResponseBody String putPalabra(@RequestParam String nombre, int cant_documentos){
+        Palabra pal = new Palabra();
+        pal.setNombre(nombre);
+        pal.setCantDocumentos(cant_documentos);
+        palabraRepository.saveAndFlush(pal);
+        return "Saved";
     }
 }
