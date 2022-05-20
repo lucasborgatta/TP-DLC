@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.print.Doc;
 import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
@@ -30,6 +31,11 @@ public class DocumentoController {
 		doc.setId(id);
 		documentoRepository.save(doc);
 		//return "Saved";
+	}
+
+	@PostMapping(path = "/add-all")
+	public ResponseEntity<List<Documento>> addAllDocument(List<Documento> documentos){
+		return new ResponseEntity<>(documentoRepository.saveAll(documentos), HttpStatus.OK);
 	}
 
 	@GetMapping(path = "/skere")

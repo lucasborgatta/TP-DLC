@@ -1,11 +1,14 @@
 package com.utn.dlc.app.controller;
+import com.utn.dlc.app.entity.Documento;
 import com.utn.dlc.app.entity.Palabra;
 import com.utn.dlc.app.repository.PalabraRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 
 
@@ -25,6 +28,11 @@ public class PalabraController {
 
         palabraRepository.save(palabra);
         //return "Saved";
+    }
+
+    @PostMapping(path = "/add-all")
+    public ResponseEntity<List<Palabra>> addAllPalabras(List<Palabra> palabras){
+        return new ResponseEntity<>(palabraRepository.saveAll(palabras), HttpStatus.OK);
     }
 
     @GetMapping(path= "/all")
