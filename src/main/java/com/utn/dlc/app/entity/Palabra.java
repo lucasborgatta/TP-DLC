@@ -3,7 +3,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import javax.persistence.*;
 
 
-@Entity
+@Entity(name = "palabras")
 @Table(name = "palabras")
 @EntityListeners(AuditingEntityListener.class)
 
