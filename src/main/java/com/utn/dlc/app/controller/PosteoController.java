@@ -1,12 +1,17 @@
 package com.utn.dlc.app.controller;
 
 
+import com.utn.dlc.app.entity.Documento;
+import com.utn.dlc.app.entity.Palabra;
 import com.utn.dlc.app.entity.Posteo;
 import com.utn.dlc.app.entity.PosteoPKId;
 import com.utn.dlc.app.repository.PosteoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -25,6 +30,11 @@ public class PosteoController {
         posteo.setNombre_palabra(nombre_palabra);
         posteoRepository.save(posteo);
         return "Saved";
+    }
+
+    @PostMapping(path = "/add-all")
+    public ResponseEntity<List<Posteo>> addAllPosteos(List<Posteo> posteos){
+        return new ResponseEntity<>(posteoRepository.saveAll(posteos), HttpStatus.OK);
     }
 
     @GetMapping(path = "/all") // Todos
