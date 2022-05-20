@@ -4,10 +4,15 @@ import com.utn.dlc.app.entity.Documento;
 import com.utn.dlc.app.entity.Palabra;
 import com.utn.dlc.app.repository.DocumentoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.transaction.Transactional;
+import java.util.List;
 import java.util.Optional;
 
 @Controller
@@ -25,6 +30,11 @@ public class DocumentoController {
 		doc.setId(id);
 		documentoRepository.save(doc);
 		//return "Saved";
+	}
+
+	@GetMapping(path = "/skere")
+	public ResponseEntity<List<Documento>> skere(Long id){
+		return new ResponseEntity<>(documentoRepository.getDocumentoById(id), HttpStatus.OK);
 	}
 
 	@GetMapping(path = "/all")
