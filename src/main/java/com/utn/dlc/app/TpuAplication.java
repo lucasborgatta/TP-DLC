@@ -26,6 +26,7 @@ public class TpuAplication {
 
 		long startTime = System.currentTimeMillis();
 
+		// Esto es para poder hacer la conexion a la base y tener una conexion que podamos manejar con codigo
 		String driver = "com.mysql.cj.jdbc.Driver";
 		String url = "jdbc:mysql://tpi-dlc.mysql.database.azure.com:3306/tpi?useSSL=false&serverTimezone=America/Argentina/Buenos_Aires";
 
@@ -39,30 +40,5 @@ public class TpuAplication {
 		System.out.println(endtime);
 
 	}
-
-
-
-
-
-
-
-		/*
-		for (int i = 0; i < palabras.size(); i++) {
-
-
-			Palabra palabra = palabras.get(i);
-			System.out.println(palabra.getNombre());
-
-
-			statement.setString(1, palabras.get(i));
-			statement.setInt(2, 0);
-			statement.addBatch();
-		}
-
-		statement.executeBatch();
-		System.out.println("BATCH");
-
-
-		 */
-	}
+}
 
