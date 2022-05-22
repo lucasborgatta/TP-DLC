@@ -37,7 +37,7 @@ public class Index {
 
         long startTime = System.currentTimeMillis();
 
-        File folder = new File("C:\\» Universidad\\DLC\\TP\\src\\main\\resources\\Prueba");
+        File folder = new File("C:\\» Universidad\\DLC\\TP\\src\\main\\resources\\static\\Files");
         int contadorDocumentos = 0;
         ArrayList<String> stopWords = stopWords();
 
@@ -54,7 +54,7 @@ public class Index {
 
             while ((linea = br.readLine()) != null) {
 
-                StringTokenizer st = new StringTokenizer(linea, " \n1234567890.,;:!?-_\"()[]{}\\¡¿#$%&/=*-+*|°¬@<>;'�\u0015~`");
+                StringTokenizer st = new StringTokenizer(linea, " \n1234567890.,;:!?-_\"()[]{}\\¡¿#$%&/=*-+*|°¬@<>;'�\u0015~`\f\u0007\u001A");
 
                 while (st.hasMoreTokens()) {
 
@@ -187,7 +187,6 @@ public class Index {
             insertPalabras = insertPalabras + values;
         }
 
-        System.out.println(insertPalabras);
 
         PreparedStatement statement = connection.prepareStatement(insertPalabras);
         statement.execute();
@@ -233,7 +232,6 @@ public class Index {
             insertPosteos = insertPosteos + values;
         }
 
-        System.out.println(insertPosteos);
 
         PreparedStatement statement = connection.prepareStatement(insertPosteos);
         statement.execute();
