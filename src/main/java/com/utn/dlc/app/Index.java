@@ -31,7 +31,7 @@ public class Index {
     private String update = "UPDATE";
 
     HashMap<String, Integer> hashMapPalabrasdeTodosLosDocumentos = new HashMap<>();
-
+    HashMap<String, Integer> hashMapPosteoPorDocumento = new HashMap<String, Integer>();
 
     public void index(Connection connection) throws IOException, SQLException {
 
@@ -42,8 +42,6 @@ public class Index {
         ArrayList<String> stopWords = stopWords();
 
         for (File file : folder.listFiles()) {
-
-            HashMap<String, Integer> hashMapPosteoPorDocumento = new HashMap<String, Integer>();
 
             System.out.println("POSTEO DOCUMENTO");
 
@@ -56,7 +54,7 @@ public class Index {
 
             while ((linea = br.readLine()) != null) {
 
-                StringTokenizer st = new StringTokenizer(linea, " \n1234567890.,;:!?-_\"()[]{}¡¿#$%&/=*-+*|°¬@<>;'�");
+                StringTokenizer st = new StringTokenizer(linea, " \n1234567890.,;:!?-_\"()[]{}\\¡¿#$%&/=*-+*|°¬@<>;'�\u0015~`");
 
                 while (st.hasMoreTokens()) {
 
@@ -88,6 +86,8 @@ public class Index {
             postearPosteo(connection, contadorDocumentos, hashMapPosteoPorDocumento);
 
             contadorDocumentos++;
+
+            hashMapPosteoPorDocumento.clear();
             // Mirar si el posteo de posteos no se puede hacer cada 10 documentos si no el numero de llamadas se nos va mucho
         }
 
@@ -193,9 +193,6 @@ public class Index {
         statement.execute();
         statement.clearParameters();
         statement.clearBatch();
-
-
-
     }
 
     public void postearDocumentos(Connection connection, Integer numeroDocumento, String nombreDocumento) throws SQLException {
@@ -244,48 +241,6 @@ public class Index {
         statement.clearBatch();
     }
 
-    public void actualizarPalabras(Connection connection) {
-
-    }
-
-
-    public ArrayList<String> getPalabraById(String value) {
-        HttpClient client = HttpClientBuilder.create().build();
-        String url = "http://localhost:8080/palabras/id?nombre=" + value;
-        HttpGet get = new HttpGet(url);
-        ArrayList<String> getResponse = new ArrayList<String>();
-        //List<BasicNameValuePair> urlParameters = new ArrayList<>();
-        //urlParameters.add(new BasicNameValuePair("nombre", "bancamos"));
-        //request.setHeader("nombre", "bancamos");
-
-        try {
-            HttpResponse response = client.execute(get);
-            HttpEntity entity = response.getEntity();
-            if (entity != null) {
-                try (InputStream stream = entity.getContent()) {
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
-                    String line;
-                    String palabra;
-                    while ((line = reader.readLine()) != null) {
-                        StringTokenizer st = new StringTokenizer(line, " \n:,\"{}");
-                        while (st.hasMoreTokens()) {
-                            palabra = st.nextToken();
-                            if (!(palabra.equals("nombre") || palabra.equals("cantDocumentos"))) {
-                                System.out.println(palabra);
-                                getResponse.add(palabra);
-                            }
-                        }
-                    }
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return getResponse;
-    }
-
-
-
 
     public ArrayList<String> stopWords() throws IOException {
         File file = new File("C:\\» Universidad\\DLC\\TP\\src\\main\\resources\\stop_words_english.txt");
@@ -299,124 +254,4 @@ public class Index {
         return words;
 //        System.out.println(words);
     }
-
-
-    /**
-     * StringTokenizer st = new StringTokenizer(archivo, delimitidador);
-     * <p>
-     * while (st.hasMoreTokens()) {  System.out.println(st.nextToken());
-     */
-
-
-    public static void sendGetDocumento() throws IOException {
-        CloseableHttpClient httpClient = HttpClients.createDefault();
-
-        HttpGet request = new HttpGet("http://localhost:8080/documentos/all");
-
-        try (CloseableHttpResponse response = httpClient.execute(request)) {
-
-            HttpGet request2 = new HttpGet("http://localhost:8080/documentos/all");
-
-            System.out.println(response.getStatusLine().toString());
-
-            HttpEntity entity = response.getEntity();
-            Header headers = entity.getContentType();
-            System.out.println(headers);
-
-            if (entity != null) {
-                // return it as a String
-                String result = EntityUtils.toString(entity);
-                System.out.println(result);
-            }
-        }
-    }
-
-    public void sendPostDocumento(int contador, String nombreDoc) throws IOException {
-        List<BasicNameValuePair> urlParameters = new ArrayList<>();
-        HttpPost post = new HttpPost("http://localhost:8080/documentos/add");
-
-        // Esto se agrega cunado necesitamos pasar los parametros (los del postman)
-        urlParameters.add(new BasicNameValuePair("nombre", nombreDoc));
-        urlParameters.add(new BasicNameValuePair("id", Integer.toString(contador)));
-
-        post.setEntity(new UrlEncodedFormEntity(urlParameters));
-
-        try (CloseableHttpClient httpClient = HttpClients.createDefault();
-             CloseableHttpResponse response = httpClient.execute(post)) {
-
-            //System.out.println(EntityUtils.toString(response.getEntity()));
-        }
-    }
-
-    public static void sendPostPalabras(String nombrePalabra) throws IOException {
-        HttpPost post = new HttpPost("http://localhost:8080/palabras/add");
-        List<BasicNameValuePair> urlParameters = new ArrayList<>();
-        urlParameters.add(new BasicNameValuePair("nombre", nombrePalabra));
-        post.setEntity(new UrlEncodedFormEntity(urlParameters));
-
-        try (CloseableHttpClient httpClient = HttpClients.createDefault();
-             CloseableHttpResponse response = httpClient.execute(post)) {
-
-            //System.out.println(EntityUtils.toString(response.getEntity()));
-        }
-    }
-
-    public static void sendPutPalabras(String nombrePalabra, int cantidadDocumentos) throws IOException {
-        HttpPut put = new HttpPut("http://localhost:8080/palabras/put");
-        List<BasicNameValuePair> urlParameters = new ArrayList<>();
-        urlParameters.add(new BasicNameValuePair("nombre", nombrePalabra));
-        urlParameters.add(new BasicNameValuePair("cantidadDocumentos", Integer.toString(cantidadDocumentos)));
-        put.setEntity(new UrlEncodedFormEntity(urlParameters));
-
-        try {
-            CloseableHttpClient closeableHttpClient = HttpClients.createDefault();
-            CloseableHttpResponse response = closeableHttpClient.execute(put);
-
-            //System.out.println(EntityUtils.toString(response.getEntity()));
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-    }
-
-
-    public static void sendPostPosteos(int contador, String nombreDoc) throws IOException {
-        HttpPost post = new HttpPost("http://localhost:8080/posteos/add");
-        List<BasicNameValuePair> urlParameters = new ArrayList<>();
-        urlParameters.add(new BasicNameValuePair("id_documento", Integer.toString(contador)));
-        urlParameters.add(new BasicNameValuePair("nombre_palabra", nombreDoc));
-
-        post.setEntity(new UrlEncodedFormEntity(urlParameters));
-
-        try (CloseableHttpClient httpClient = HttpClients.createDefault();
-             CloseableHttpResponse response = httpClient.execute(post)) {
-
-            //System.out.println(EntityUtils.toString(response.getEntity()));
-        }
-    }
-
-    public static void sendPutPosteosFrecuencia(Long id_Documento, String nombrePalabra, int frecuencia) throws IIOException, UnsupportedEncodingException {
-        HttpPut put = new HttpPut("http://localhost:8080/posteos/updateFrecuencia");
-        List<BasicNameValuePair> urlParameters = new ArrayList<>();
-        urlParameters.add(new BasicNameValuePair("id_documento", Long.toString(id_Documento)));
-        urlParameters.add(new BasicNameValuePair("nombre_palabra", nombrePalabra));
-        urlParameters.add(new BasicNameValuePair("frecuencia", Integer.toString(frecuencia)));
-        put.setEntity(new UrlEncodedFormEntity(urlParameters));
-
-        try {
-            CloseableHttpClient httpClient = HttpClients.createDefault();
-            CloseableHttpResponse response = httpClient.execute(put);
-
-            //System.out.println(EntityUtils.toString(response.getEntity()));
-
-        } catch (ClientProtocolException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-
-
 }
