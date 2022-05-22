@@ -26,37 +26,14 @@ public class TpuAplication {
 
 		long startTime = System.currentTimeMillis();
 
-		Index in = new Index();
-		Set<String> palabras = in.index();
-		Iterator iterator = palabras.iterator();
-		System.out.println("Cantidad de palabras " + palabras.size());
-
-
 		String driver = "com.mysql.cj.jdbc.Driver";
 		String url = "jdbc:mysql://tpi-dlc.mysql.database.azure.com:3306/tpi?useSSL=false&serverTimezone=America/Argentina/Buenos_Aires";
-
 
 		Class.forName(driver).newInstance();
 		Connection connection = DriverManager.getConnection(url, "Programa", "Programa123456789");
 
-			String query = "INSERT INTO palabras values";
-
-			for (int j = 0; j < palabras.size(); j++) {
-				String values = "";
-				if (j == palabras.size() - 1) {
-					values = " (" + "'" + iterator.next() + "'" + "," + 0 + ")";
-				} else {
-					values = " (" + "'" + iterator.next() + "'" + "," + 0 + "),";
-
-				}
-				query = query + values;
-			}
-
-			System.out.println(query);
-			PreparedStatement statement = connection.prepareStatement(query);
-			statement.execute();
-			statement.clearParameters();
-			statement.clearBatch();
+		Index in = new Index();
+		in.index(connection);
 
 		long endtime = System.currentTimeMillis() - startTime;
 		System.out.println(endtime);

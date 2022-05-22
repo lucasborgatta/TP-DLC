@@ -20,11 +20,20 @@ import org.apache.http.util.EntityUtils;
 
 import javax.imageio.IIOException;
 import java.io.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.*;
 
 public class Index {
 
-    public Set<String> index() throws IOException {
+    private String update = "UPDATE";
+
+    HashMap<String, Integer> hashMapPalabrasdeTodosLosDocumentos = new HashMap<>();
+
+
+    public void index(Connection connection) throws IOException, SQLException {
 
         long startTime = System.currentTimeMillis();
 
@@ -32,23 +41,10 @@ public class Index {
         int contadorDocumentos = 0;
         ArrayList<String> stopWords = stopWords();
 
-        HashMap<String, Integer> arrayList = new HashMap<String, Integer>();
-
-        /*
-        HashMap<String, Integer> hashMapPalabrasdeTodosLosDocumentos = new HashMap<>();
-        HashMap<String, Integer> hashMapPosteoPorDocumento = new HashMap<String, Integer>();
-
-        Set<String> keyHashMapPosteos;
-        Collection<Integer> frecuencias;
-
-        Set<String> keyHashMapPalabras;
-        Collection<Integer> cantidadDocumentos;
-
-         */
-
         for (File file : folder.listFiles()) {
 
-            //this.sendPostDocumento(contadorDocumentos, file.getName());
+            HashMap<String, Integer> hashMapPosteoPorDocumento = new HashMap<String, Integer>();
+
             System.out.println("POSTEO DOCUMENTO");
 
             System.out.println(file.getName());
@@ -64,80 +60,46 @@ public class Index {
 
                 while (st.hasMoreTokens()) {
 
-                    palabra = st.nextToken().toLowerCase();
+                    palabra = st.nextToken().toLowerCase(); // Pasamos todas las palabras a minuscula
 
                     if (!stopWords.contains(palabra)) { // Controlamos que la palabra no sea una stop word del diccionario
 
-                        Palabra palabra1 = new Palabra();
-                        palabra1.setNombre(palabra);
-
-                        arrayList.put(palabra, 0);
-                        }
-                    }
-                }
-            }
-        Set<String> keySet = arrayList.keySet();
-        return keySet;
-    }
-
-                        /*
-                        // Guardamos en la hash map
+                        // Guardamos en la hash map de los posteos
                         // Si la hash map ya tenia la palabra, osea que aparecio en el documento entonces aumentamos en 1 el contador de frecuencias
                         if (hashMapPosteoPorDocumento.containsKey(palabra)) {
                             int contadorAux = hashMapPosteoPorDocumento.get(palabra);
-                            contadorAux ++;
+                            contadorAux++;
                             hashMapPosteoPorDocumento.put(palabra, contadorAux);
-                        }
-                        else
-                        {
+                        } else {
                             // Si la hash map no tenia la palabra, la agregamos y ponemos el contador en 1
                             hashMapPosteoPorDocumento.put(palabra, 1);
                         }
-
-                        // Guarda la palabra en la base
-                        //sendPostPalabras(palabra);
-
-                        // Guarda el documento en la base
-                        sendPostPosteos(contadorDocumentos, palabra);
-                        System.out.println("POSTEO DE POSTEOS");
                     }
                 }
             }
 
-            // Aca es cuando se termina de leer todo el documento, entonces aca tenemos que actualizar en las tablas de la base lo que nos dio la hash map
+            // Con este metodo nos fijamos que palabras aparecieron en el documento que leimos entonces le podemos aumentar 1 en su contador
+            completarHashMaps(hashMapPosteoPorDocumento);
+            // Cuando terminamos de leer 1 documento guardamos primero todas sus palabras y despues todos sus posteos
+            postearPalabras(connection, hashMapPalabrasdeTodosLosDocumentos);
 
-            keyHashMapPosteos = hashMapPosteoPorDocumento.keySet();
-            frecuencias = hashMapPosteoPorDocumento.values();
+            postearDocumentos(connection, contadorDocumentos, file.getName());
 
-            Iterator iteratorKey = keyHashMapPosteos.iterator();
-            Iterator iteratorValue = frecuencias.iterator();
-
-            // Actualizamos la tabla de posteos con los datos que leimos del documento
-            while (iteratorKey.hasNext()) {
-
-                String palabraKey = String.valueOf(iteratorKey.next());
-                int frecuenciasValue = Integer.parseInt(String.valueOf(iteratorValue.next()));
-
-                sendPutPosteosFrecuencia((long) contadorDocumentos, palabraKey, frecuenciasValue);
-
-                if (hashMapPalabrasdeTodosLosDocumentos.containsKey(palabraKey)) {
-                    int contadorAux = hashMapPalabrasdeTodosLosDocumentos.get(palabraKey);
-                    contadorAux++;
-                    hashMapPalabrasdeTodosLosDocumentos.put(palabraKey, contadorAux);
-                }
-                else
-                {
-                    hashMapPalabrasdeTodosLosDocumentos.put(palabraKey, 1);
-                }
-            }
-
-            // Borramos la HashMap de posteos
-            keyHashMapPosteos.clear();
-            frecuencias.clear();
+            postearPosteo(connection, contadorDocumentos, hashMapPosteoPorDocumento);
 
             contadorDocumentos++;
-            hashMapPosteoPorDocumento.clear();
+            // Mirar si el posteo de posteos no se puede hacer cada 10 documentos si no el numero de llamadas se nos va mucho
         }
+
+            // Aca es cuando se termina de leer 1 documento, entonces tenemos que actualizar la hashmap que tiene todas las palabras en base a la hashmap del posteo
+
+
+
+
+
+            /*
+
+            ESTO NO ME ACUERDO BIEN LO QUE HACIA ASI QUE POR AHORA QUEDA COMENTADO
 
         keyHashMapPalabras = hashMapPalabrasdeTodosLosDocumentos.keySet();
         cantidadDocumentos = hashMapPalabrasdeTodosLosDocumentos.values();
@@ -162,7 +124,130 @@ public class Index {
 
         long endTime = System.currentTimeMillis() - startTime;
         System.out.println("Tiempo de ejecucion " + endTime);
+
+             */
+
+     }
+
+
+
+
+    public void completarHashMaps(HashMap<String, Integer> hashMapPosteoPorDocumento) {
+
+        Set<String> keyHashMapPosteos;
+        keyHashMapPosteos = hashMapPosteoPorDocumento.keySet();
+
+        Iterator iteratorKey = keyHashMapPosteos.iterator();
+
+        // Actualizamos la tabla de posteos con los datos que leimos del documento
+        while (iteratorKey.hasNext()) {
+
+            String palabraKey = String.valueOf(iteratorKey.next());
+
+            if (hashMapPalabrasdeTodosLosDocumentos.containsKey(palabraKey)) {
+                int contadorAux = hashMapPalabrasdeTodosLosDocumentos.get(palabraKey);
+                contadorAux++;
+                hashMapPalabrasdeTodosLosDocumentos.put(palabraKey, contadorAux);
+            }
+            else
+            {
+                hashMapPalabrasdeTodosLosDocumentos.put(palabraKey, 1);
+            }
+        }
     }
+
+
+
+
+    public void postearPalabras(Connection connection, HashMap<String, Integer> hashMapPalabrasdeTodosLosDocumentos ) throws SQLException {
+
+        String insertPalabras = "INSERT INTO palabras (nombre, cant_documentos) values";
+
+        Set<String> keyHashMapPalabras = hashMapPalabrasdeTodosLosDocumentos.keySet();
+        Collection<Integer> cantidadDocumentos = hashMapPalabrasdeTodosLosDocumentos.values();
+
+        System.out.println("Cantidad de palabras " + keyHashMapPalabras.size());
+
+        Iterator iteratorPalabra = keyHashMapPalabras.iterator();
+        Iterator iteratorFrecuencia = cantidadDocumentos.iterator();
+
+        for (int j = 0; j < hashMapPalabrasdeTodosLosDocumentos.size(); j++) {
+
+            String values = "";
+
+            if (j == hashMapPalabrasdeTodosLosDocumentos.size() - 1) {
+
+                values = " ('" + iteratorPalabra.next() + "'," + iteratorFrecuencia.next() + ") ON DUPLICATE KEY UPDATE cant_documentos = cant_documentos + 1";
+
+            } else {
+
+                values = " ('" + iteratorPalabra.next() + "'," + iteratorFrecuencia.next() + "),";
+
+            }
+            insertPalabras = insertPalabras + values;
+        }
+
+        System.out.println(insertPalabras);
+
+        PreparedStatement statement = connection.prepareStatement(insertPalabras);
+        statement.execute();
+        statement.clearParameters();
+        statement.clearBatch();
+
+
+
+    }
+
+    public void postearDocumentos(Connection connection, Integer numeroDocumento, String nombreDocumento) throws SQLException {
+
+        String insertDocumentos = "INSERT IGNORE INTO documentos values";
+
+        insertDocumentos = insertDocumentos + "(" + numeroDocumento + ",'" + nombreDocumento + "')";
+
+        PreparedStatement statement = connection.prepareStatement(insertDocumentos);
+        statement.execute();
+        statement.clearParameters();
+        statement.clearBatch();
+    }
+
+    public void postearPosteo(Connection connection, Integer numeroDocumento, HashMap<String, Integer> hashMapPosteoPorDocumento) throws SQLException {
+
+        String insertPosteos = "REPLACE INTO posteos values";
+
+        Set<String> keyHashMapPosteos = hashMapPosteoPorDocumento.keySet();
+        Collection<Integer> frecuencias = hashMapPosteoPorDocumento.values();
+
+        Iterator iteratorPalabra = keyHashMapPosteos.iterator();
+        Iterator iteratorFrecuencia = frecuencias.iterator();
+
+        for (int j = 0; j < hashMapPosteoPorDocumento.size(); j++) {
+
+            String values = "";
+
+            if (j == hashMapPosteoPorDocumento.size() - 1) {
+
+                values = "(" + numeroDocumento + ",'" + iteratorPalabra.next() + "'," + iteratorFrecuencia.next() + "," + 0 + ")";
+
+            } else {
+
+                values = "(" + numeroDocumento + ",'" + iteratorPalabra.next() + "'," + iteratorFrecuencia.next() + "," + 0 + "),";
+
+            }
+            insertPosteos = insertPosteos + values;
+        }
+
+        System.out.println(insertPosteos);
+
+        PreparedStatement statement = connection.prepareStatement(insertPosteos);
+        statement.execute();
+        statement.clearParameters();
+        statement.clearBatch();
+    }
+
+    public void actualizarPalabras(Connection connection) {
+
+    }
+
 
     public ArrayList<String> getPalabraById(String value) {
         HttpClient client = HttpClientBuilder.create().build();
@@ -199,7 +284,7 @@ public class Index {
         return getResponse;
     }
 
-                         */
+
 
 
     public ArrayList<String> stopWords() throws IOException {
