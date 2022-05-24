@@ -1,9 +1,8 @@
 package com.utn.dlc.app;
 
+import javax.persistence.criteria.CriteriaBuilder;
 import java.io.*;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.*;
 
 public class Index {
@@ -156,6 +155,43 @@ public class Index {
         statement.execute();
         statement.clearParameters();
         statement.clearBatch();
+    }
+
+    public int getCantidadDocumentos(Connection connection, String palabra) throws SQLException{
+        String consulta = "select count(p.id_documento) from posteos p where p.nombre_palabra like";
+        consulta = consulta + "\"" + palabra +"\"";
+        Statement statement = connection.createStatement();
+        ResultSet rs;
+        rs = statement.executeQuery(consulta);
+        while (rs.next()){
+            int count = rs.getInt(1);
+            return count;
+        }
+        return 0;
+    }
+
+    public ArrayList getDatosPeso(Connection connection, String termino) throws SQLException{
+        ArrayList array = new ArrayList();
+        List<List<Integer>> secondArray = new ArrayList<>();
+
+        String consulta = "select p.frecuencia, p.id_documento,count(p.id_documento)  from posteos p where p.nombre_palabra like";
+        consulta = consulta + "\"" + termino +"\"" + "group by p.frecuencia, p.id_documento";
+        Statement statement = connection.createStatement();
+        ResultSet rs;
+        rs = statement.executeQuery(consulta);
+        int cant_documentos = 0;
+        while (rs.next()){
+            List<Integer> thirdArray= new ArrayList<>();
+            int frecuencia = rs.getInt(1);
+            int idDoc = rs.getInt(2);
+            thirdArray.add(frecuencia);
+            thirdArray.add(idDoc);
+            cant_documentos += rs.getInt(3);
+            secondArray.add(thirdArray);
+        }
+        array.add(secondArray);
+        array.add(cant_documentos);
+        return array;
     }
 
     // Este funciona igual que el de arriba

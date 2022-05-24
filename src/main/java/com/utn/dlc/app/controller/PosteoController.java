@@ -1,8 +1,6 @@
 package com.utn.dlc.app.controller;
 
 
-import com.utn.dlc.app.entity.Documento;
-import com.utn.dlc.app.entity.Palabra;
 import com.utn.dlc.app.entity.Posteo;
 import com.utn.dlc.app.entity.PosteoPKId;
 import com.utn.dlc.app.repository.PosteoRepository;
@@ -108,7 +106,6 @@ public class PosteoController {
         posteoPKId.setNombrePalabra(nombre_palabra);
 
         if (posteoRepository.existsById(posteoPKId)) { // Si este posteo ya existe en la tabla lo unico que tenemos que hacer es incrementar en 1 su frecuencia
-            posteo.setPeso(peso);
         }
         else
         {
