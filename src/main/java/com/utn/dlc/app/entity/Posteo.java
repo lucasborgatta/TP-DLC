@@ -9,7 +9,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 
-@Entity(name = "palabras")
+@Entity(name = "posteos")
 @Table(name = "posteos")
 @Data
 @NoArgsConstructor
