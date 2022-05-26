@@ -1,7 +1,5 @@
 package com.utn.dlc.app.models;
 
-import com.utn.dlc.app.entity.Palabra;
-
 public class CalculoPeso {
     int frecuenciaTerminoR; //cantidad de veces que tr aparece en el documento di.
     int frecuenciaTerminoS; //cantidad de veces que ts aparece en el documento di.
@@ -11,7 +9,7 @@ public class CalculoPeso {
     double frecuenciaInversaR; //frecuencia inversa del término tr. (logaritmo del cociente entre N y nr.)
     double frecuenciaInversaS; //frecuencia inversa del término ts. (logaritmo del cociente entre N y ns.)
 
-
+/*
     public double calcularPeso(Palabra termR, int cantidadPalabrasxDocumento){
         double peso = 0;
         double sumatoria = 0;
@@ -37,4 +35,6 @@ public class CalculoPeso {
 
         return peso;
     }
+
+ */
 }

@@ -2,7 +2,6 @@ package com.utn.dlc.app.controller;
 
 
 import com.utn.dlc.app.entity.Posteo;
-import com.utn.dlc.app.entity.PosteoPKId;
 import com.utn.dlc.app.repository.PosteoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -35,6 +34,7 @@ public class PosteoController {
         return posteoRepository.findAll();
     }
 
+    /*
     @GetMapping(path = "/id") // Busca por pk compuesta
     public @ResponseBody Optional<Posteo> getPosteoByID(@RequestParam Long id_documento, String nombre_palabra) {
 
@@ -103,6 +103,7 @@ public class PosteoController {
         //return "Updated";
     }
 
+    /*
     @PutMapping(path = "/updatePeso")
     public @ResponseBody void addPesoPosteo(@RequestParam Long id_documento, String nombre_palabra, Long frecuencia, Double peso) {
 
@@ -127,7 +128,9 @@ public class PosteoController {
         posteoRepository.saveAndFlush(posteo);
 
         //return "Updated";
-    }
+
+     */
+
 }
 
 

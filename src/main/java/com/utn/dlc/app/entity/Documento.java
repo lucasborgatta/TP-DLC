@@ -12,9 +12,10 @@ public class Documento {
 	// NO SE SI HAY QUE IMPLEMENTAR EL SERIALIZABLE CON EL SERIAL VERSION UID
 
     @Id
+	@Column(name = "id_documento")
 	private Long id;
 
-	@Column(name = "nombre")
+	@Column(name = "nombreDocumento")
 	private String nombre;
 
 	public void documento() {
