@@ -15,22 +15,17 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
-@IdClass(PosteoPKId.class)
 public class Posteo {
-
-    @Id
-    @Column(name = "id_documento")
-    private Long id_documento;
 
     @Id
     @Column(name = "nombre_palabra")
     private String nombre_palabra;
 
+    @Column(name = "id_documento")
+    private Long id_documento;
+
     @Column(name = "frecuencia")
     private Long frecuencia;
-
-    @Column(name = "peso")
-    private Double peso;
 
     public Long getId_documento() {
     return id_documento;
@@ -56,11 +51,4 @@ public class Posteo {
         this.frecuencia = frecuenciaAparicion;
     }
 
-    public Double getPeso() {
-        return peso;
-    }
-
-    public void setPeso(Double peso) {
-        this.peso = peso;
-    }
 }

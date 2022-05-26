@@ -9,10 +9,13 @@ import javax.persistence.*;
 @EntityListeners(AuditingEntityListener.class)
 public class Documento {
 
-	@Id
+	// NO SE SI HAY QUE IMPLEMENTAR EL SERIALIZABLE CON EL SERIAL VERSION UID
+
+    @Id
+	@Column(name = "id_documento")
 	private Long id;
 
-	@Column(name = "nombre")
+	@Column(name = "nombreDocumento")
 	private String nombre;
 
 	public void documento() {
@@ -43,5 +46,5 @@ public class Documento {
 	public String toString() {
 		return "\nDocumento [ ID = " + id + ", Nombre = " + nombre + " ]";
 	}
-
+	
 }
