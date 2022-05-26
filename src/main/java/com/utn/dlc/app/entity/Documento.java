@@ -8,9 +8,7 @@ import javax.persistence.*;
 @Table(name = "documentos")
 @EntityListeners(AuditingEntityListener.class)
 public class Documento {
-
-	// NO SE SI HAY QUE IMPLEMENTAR EL SERIALIZABLE CON EL SERIAL VERSION UID
-
+	
     @Id
 	@Column(name = "id_documento")
 	private Long id;

@@ -121,21 +121,6 @@ public class Index {
         statement.execute();
         statement.clearParameters();
 
-
-        /*
-        // El ignore es para que si salta algun error ignore ese insert y siga con los demas
-        String insertDocumentos = "INSERT IGNORE INTO documentos values";
-
-        // Arma la query para el documento
-        insertDocumentos = insertDocumentos + "(" + numeroDocumento + ",'" + nombreDocumento + "')";
-
-        // Lo sube a la base de datos
-        PreparedStatement statement = connection.prepareStatement(insertDocumentos);
-        statement.execute();
-        statement.clearParameters();
-        statement.clearBatch();
-
-         */
     }
 
     // Este funciona igual que el de arriba
@@ -168,29 +153,6 @@ public class Index {
         statement.execute();
         statement.clearParameters();
 
-        /*
-
-        String insertPosteos = "REPLACE INTO posteos values";
-
-
-
-        for (int j = 0; j < hashMapPosteoPorDocumento.size(); j++) {
-
-            String values = "";
-
-            if (j == hashMapPosteoPorDocumento.size() - 1) {
-
-                values = "(" + numeroDocumento + ",'" + iteratorPalabra.next() + "'," + iteratorFrecuencia.next() + "," + 0 + ")";
-
-            } else {
-
-                values = "(" + numeroDocumento + ",'" + iteratorPalabra.next() + "'," + iteratorFrecuencia.next() + "," + 0 + "),";
-
-            }
-            insertPosteos = insertPosteos + values;
-        }
-
-         */
     }
 
 
