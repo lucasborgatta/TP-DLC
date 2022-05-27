@@ -4,18 +4,15 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 
-@Entity
+@Entity(name = "documentos")
 @Table(name = "documentos")
 @EntityListeners(AuditingEntityListener.class)
 public class Documento {
 
-	// NO SE SI HAY QUE IMPLEMENTAR EL SERIALIZABLE CON EL SERIAL VERSION UID
-
-    @Id
-	@Column(name = "id_documento")
+	@Id
 	private Long id;
 
-	@Column(name = "nombreDocumento")
+	@Column(name = "nombre")
 	private String nombre;
 
 	public void documento() {
@@ -46,5 +43,5 @@ public class Documento {
 	public String toString() {
 		return "\nDocumento [ ID = " + id + ", Nombre = " + nombre + " ]";
 	}
-	
+
 }
