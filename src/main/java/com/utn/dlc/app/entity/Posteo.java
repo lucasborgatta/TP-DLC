@@ -1,7 +1,5 @@
 package com.utn.dlc.app.entity;
 
-import com.utn.dlc.app.repository.PosteoRepository;
-import jdk.jfr.DataAmount;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
