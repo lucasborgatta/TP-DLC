@@ -1,7 +1,5 @@
 package com.utn.dlc.app.entity;
 
-import com.utn.dlc.app.repository.PosteoRepository;
-import jdk.jfr.DataAmount;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,7 +7,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 
-@Entity
+@Entity(name = "posteos")
 @Table(name = "posteos")
 @Data
 @NoArgsConstructor
@@ -28,7 +26,7 @@ public class Posteo {
     private Long frecuencia;
 
     public Long getId_documento() {
-    return id_documento;
+        return id_documento;
     }
 
     public void setId_documento(Long id) {
