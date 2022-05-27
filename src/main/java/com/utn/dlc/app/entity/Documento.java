@@ -4,16 +4,15 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 
-@Entity (name = "documentos")
+@Entity(name = "documentos")
 @Table(name = "documentos")
 @EntityListeners(AuditingEntityListener.class)
 public class Documento {
-	
-    @Id
-	@Column(name = "id_documento")
+
+	@Id
 	private Long id;
 
-	@Column(name = "nombreDocumento")
+	@Column(name = "nombre")
 	private String nombre;
 
 	public void documento() {
@@ -44,5 +43,5 @@ public class Documento {
 	public String toString() {
 		return "\nDocumento [ ID = " + id + ", Nombre = " + nombre + " ]";
 	}
-	
+
 }
