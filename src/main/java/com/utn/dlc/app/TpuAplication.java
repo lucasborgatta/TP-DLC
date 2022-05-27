@@ -26,7 +26,7 @@ public class TpuAplication {
 
 		Class.forName(driver).newInstance();
 		Connection connection = DriverManager.getConnection(url, "Lucas", null);
-
+		
 		Index in = new Index();
 		in.index(connection);
 
