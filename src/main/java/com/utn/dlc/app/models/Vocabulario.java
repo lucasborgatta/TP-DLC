@@ -1,4 +1,4 @@
-package com.utn.dlc.app;
+package com.utn.dlc.app.models;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;

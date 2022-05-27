@@ -1,7 +1,5 @@
 package com.utn.dlc.app.entity;
 
-import com.utn.dlc.app.repository.PosteoRepository;
-import jdk.jfr.DataAmount;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,23 +13,20 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
-@IdClass(PosteoPKId.class)
 public class Posteo {
-
-    @Id
-    @Column(name = "id_documento")
-    private Long id_documento;
 
     @Id
     @Column(name = "nombre_palabra")
     private String nombre_palabra;
 
+    @Column(name = "id_documento")
+    private Long id_documento;
+
     @Column(name = "frecuencia")
     private Long frecuencia;
 
-
     public Long getId_documento() {
-    return id_documento;
+        return id_documento;
     }
 
     public void setId_documento(Long id) {

@@ -29,7 +29,7 @@ public class TpuAplication {
 		Connection connection = DriverManager.getConnection(url, "Programa", "Programa123456789");
 
 		Index in = new Index();
-		ArrayList arrayList = new ArrayList();
+		ArrayList arrayList;
 		arrayList = in.getDatosPeso(connection, "aaron");
 		ArrayList ar2 = (ArrayList) arrayList.get(0);
 		int cantDocs = (int) arrayList.get(1);
