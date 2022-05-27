@@ -29,8 +29,7 @@ public class Posteo {
     @Column(name = "frecuencia")
     private Long frecuencia;
 
-    @Column(name = "peso")
-    private Double peso;
+
 
     public Long getId_documento() {
     return id_documento;
@@ -56,11 +55,4 @@ public class Posteo {
         this.frecuencia = frecuenciaAparicion;
     }
 
-    public Double getPeso() {
-        return peso;
-    }
-
-    public void setPeso(Double peso) {
-        this.peso = peso;
-    }
 }
