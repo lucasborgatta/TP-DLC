@@ -32,7 +32,7 @@ public class TpuAplication {
 
 		// INDEXACION
 		Index in = new Index();
-		in.index(connection);
+
 
 
 		long endtime = System.currentTimeMillis() - startTime;
