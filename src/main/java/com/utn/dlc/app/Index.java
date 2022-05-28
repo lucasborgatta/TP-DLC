@@ -30,23 +30,25 @@ public class Index {
 
             while ((linea = br.readLine()) != null) {
 
-                StringTokenizer st = new StringTokenizer(linea, " \n1234567890.,;:!?-_\"()[]{}\\¡¿#$%&/=*-+*|°¬@<>;'�\u0015~`\f\u0007\u001A\u001B");
+                StringTokenizer st = new StringTokenizer(linea, " \n1234567890.,;:!?-_\"()[]{}\\¡¿#$%&/=*-+*|°¬@<>;'�\u0015~`\f\u0007\u001A\u001B\t\u0003\u0005\u000E\u001E\u0014^« ");
 
                 while (st.hasMoreTokens()) {
 
                     palabra = st.nextToken().toLowerCase(); // Pasamos todas las palabras a minuscula
 
-                    if (!stopWords.contains(palabra)) { // Controlamos que la palabra no sea una stop word del diccionario
+                    if (!(palabra.length() == 1) && !palabra.equals(" ") && !palabra.equals("    ")) {
+                        if (!stopWords.contains(palabra)) { // Controlamos que la palabra no sea una stop word del diccionario
 
-                        // Guardamos en la hash map de los posteos
-                        // Si la hash map ya tenia la palabra, osea que aparecio en el documento entonces aumentamos en 1 el contador de frecuencias
-                        if (hashMapPosteoPorDocumento.containsKey(palabra)) {
-                            int contadorAux = hashMapPosteoPorDocumento.get(palabra);
-                            contadorAux++;
-                            hashMapPosteoPorDocumento.put(palabra, contadorAux);
-                        } else {
-                            // Si la hash map no tenia la palabra, la agregamos y ponemos el contador en 1
-                            hashMapPosteoPorDocumento.put(palabra, 1);
+                            // Guardamos en la hash map de los posteos
+                            // Si la hash map ya tenia la palabra, osea que aparecio en el documento entonces aumentamos en 1 el contador de frecuencias
+                            if (hashMapPosteoPorDocumento.containsKey(palabra)) {
+                                int contadorAux = hashMapPosteoPorDocumento.get(palabra);
+                                contadorAux++;
+                                hashMapPosteoPorDocumento.put(palabra, contadorAux);
+                            } else {
+                                // Si la hash map no tenia la palabra, la agregamos y ponemos el contador en 1
+                                hashMapPosteoPorDocumento.put(palabra, 1);
+                            }
                         }
                     }
                 }
