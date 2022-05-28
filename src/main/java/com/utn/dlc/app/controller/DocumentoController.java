@@ -1,7 +1,7 @@
 package com.utn.dlc.app.controller;
 
 import com.utn.dlc.app.entity.Documento;
-import com.utn.dlc.app.entity.Palabra;
+
 import com.utn.dlc.app.repository.DocumentoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
