@@ -1,10 +1,8 @@
 package com.utn.dlc.app.models;
 
-import java.io.*;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 public class Vocabulario {
 
@@ -19,7 +17,7 @@ public class Vocabulario {
 
     public HashMap<String, ArrayList<Integer>> getDatosVocabulario(Connection connection) throws SQLException {
         HashMap<String, ArrayList<Integer>> hash = new HashMap<>();
-        String consulta = "select distinct p.nombre_palabra, count(p.id_documento), max(p.frecuencia) from posteos p group by  p.nombre_palabra";
+        String consulta = "select p.nombre_palabra, count(p.id_documento), max(p.frecuencia) from posteos p group by  p.nombre_palabra";
         Statement statement = connection.createStatement();
         ResultSet rs;
         rs = statement.executeQuery(consulta);
