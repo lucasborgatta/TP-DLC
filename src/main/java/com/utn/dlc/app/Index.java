@@ -4,6 +4,7 @@ import java.io.*;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.*;
 
 public class Index {
@@ -25,6 +26,8 @@ public class Index {
 
             String linea;
             String palabra;
+
+
 
             BufferedReader br = new BufferedReader(new FileReader(file));
 
@@ -65,53 +68,27 @@ public class Index {
             // Limpiamos la hashmap para liberar memoria
             hashMapPosteoPorDocumento.clear();
             // Mirar si el posteo de posteos no se puede hacer cada 10 documentos si no el numero de llamadas se nos va mucho
+            System.out.println(1);
         }
      }
 
 
     // La connection que se pasa por parametros es para poder hacer la subida a la base, tiene que estar en el tpu aplicattion si o si, no puede estar aca
 
-    // Este metodo no se usa mas pero lo dejo por si tenemos que sacar algo de aca PERO NO SE USA
-    public void postearPalabras(Connection connection, HashMap<String, Integer> hashMapPalabrasdeTodosLosDocumentos ) throws SQLException {
-
-        String insertPalabras = "INSERT INTO palabras (nombre, cant_documentos) values";
-
-        // Esto es para recorrer los datos de la hashmap
-        Set<String> keyHashMapPalabras = hashMapPalabrasdeTodosLosDocumentos.keySet();
-        Collection<Integer> cantidadDocumentos = hashMapPalabrasdeTodosLosDocumentos.values();
-
-        System.out.println("Cantidad de palabras " + keyHashMapPalabras.size());
-
-        Iterator iteratorPalabra = keyHashMapPalabras.iterator();
-        Iterator iteratorCantidadDocumentos = cantidadDocumentos.iterator();
-
-        for (int j = 0; j < hashMapPalabrasdeTodosLosDocumentos.size(); j++) {
-
-            String values = "";
-
-            // Si esta en la ultima linea hace la query pero sin ponerle la coma al final
-            if (j == hashMapPalabrasdeTodosLosDocumentos.size() - 1) {
-
-                // El iterator Palabra trae la palabra y el iterator cantidad de documentos trae la cantidad de documentos de esa palabra para meter adentro de la query
-                values = " ('" + iteratorPalabra.next() + "'," + iteratorCantidadDocumentos.next() + ") ON DUPLICATE KEY UPDATE cant_documentos = cant_documentos + 1"; // El duplicate key update es para que no salte el error por clave duplicada y actualice los contadores
-
-            } else {
-
-                values = " ('" + iteratorPalabra.next() + "'," + iteratorCantidadDocumentos.next() + "),";
-
-            }
-            // Se arma la query enorme
-            insertPalabras = insertPalabras + values;
-        }
-
-        // Se hace la llamada a la base de datos
-        PreparedStatement statement = connection.prepareStatement(insertPalabras);
-        statement.execute();
-        statement.clearParameters();
-        statement.clearBatch();
-    }
-
     public void postearDocumentos(Connection connection, Integer numeroDocumento, String nombreDocumento) throws SQLException {
+
+        /*
+        System.out.println(1);
+
+        PreparedStatement preparedStatement = connection.prepareStatement("INSERT IGNORE INTO documentos values (?,?)");
+
+        preparedStatement.setInt(1, numeroDocumento);
+        preparedStatement.setString(2, nombreDocumento);
+        preparedStatement.execute();
+        preparedStatement.clearParameters();
+
+         */
+
 
         StringBuilder stringBuilder = new StringBuilder("INSERT IGNORE INTO documentos values");
 
@@ -123,10 +100,44 @@ public class Index {
         statement.execute();
         statement.clearParameters();
 
+
     }
 
     // Este funciona igual que el de arriba
     public void postearPosteo(Connection connection, Integer numeroDocumento, HashMap<String, Integer> hashMapPosteoPorDocumento) throws SQLException {
+
+        /*
+        System.out.println(2);
+
+        PreparedStatement preparedStatement = connection.prepareStatement("REPLACE INTO posteos values (?,?,?)");
+
+        Set<String> keyHashMapPosteos = hashMapPosteoPorDocumento.keySet();
+        Collection<Integer> frecuencias = hashMapPosteoPorDocumento.values();
+
+        Iterator iteratorPalabra = keyHashMapPosteos.iterator();
+        Iterator iteratorFrecuencia = frecuencias.iterator();
+
+        for (int i = 0; i < hashMapPosteoPorDocumento.size(); i++) {
+
+            preparedStatement.setInt(1, numeroDocumento);
+            preparedStatement.setString(2, (String) iteratorPalabra.next());
+            preparedStatement.setInt(3, (Integer) iteratorFrecuencia.next());
+            preparedStatement.addBatch();
+
+            if (i % 30000 == 0) {
+                System.out.println(3);
+                preparedStatement.executeBatch();
+                preparedStatement.clearParameters();
+            }
+        }
+
+        preparedStatement.executeBatch();
+        preparedStatement.clearParameters();
+         */
+
+
+
+
 
         StringBuilder stringBuilder = new StringBuilder("REPLACE INTO posteos values");
 
@@ -154,6 +165,8 @@ public class Index {
         PreparedStatement statement = connection.prepareStatement(String.valueOf(stringBuilder));
         statement.execute();
         statement.clearParameters();
+
+
 
     }
 
