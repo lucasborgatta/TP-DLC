@@ -1,6 +1,5 @@
 package com.utn.dlc.app;
 
-import com.zaxxer.hikari.util.ConcurrentBag;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -13,8 +12,6 @@ import java.util.HashMap;
 import java.util.StringTokenizer;
 
 public class Vocabulario {
-
-    public ConcurrentBag<ConcurrentBag.IConcurrentBagEntry> getPosteoById;
 
     public void setVocabulario(){
         File folder = new File("C:\\Users\\nahue\\OneDrive\\Documentos\\GitHub\\TP-DLC\\src\\main\\resources\\Prueba");
@@ -132,6 +129,4 @@ public class Vocabulario {
         return getResponse;
     }
 
-    public HashMap<String, ArrayList<Integer>> getDatosVocabulario() {
-    }
 }

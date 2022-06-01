@@ -1,11 +1,17 @@
 package com.utn.dlc.app.controller;
 
 
+import com.utn.dlc.app.entity.Documento;
+import com.utn.dlc.app.entity.Palabra;
 import com.utn.dlc.app.entity.Posteo;
+import com.utn.dlc.app.entity.PosteoPKId;
 import com.utn.dlc.app.repository.PosteoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -17,15 +23,18 @@ public class PosteoController {
 
     @PostMapping(path = "/add")
     public @ResponseBody
-    void addNewPosteo(@RequestParam Long id_documento, String nombre_palabra) {
+    String addNewPosteo(@RequestParam Long id_documento, String nombre_palabra) {
 
         Posteo posteo = new Posteo();
         posteo.setId_documento(id_documento);
         posteo.setNombre_palabra(nombre_palabra);
-
         posteoRepository.save(posteo);
+        return "Saved";
+    }
 
-        //return "Posteo Saved";
+    @PostMapping(path = "/add-all")
+    public ResponseEntity<List<Posteo>> addAllPosteos(List<Posteo> posteos){
+        return new ResponseEntity<>(posteoRepository.saveAll(posteos), HttpStatus.OK);
     }
 
     @GetMapping(path = "/all") // Todos
@@ -34,7 +43,6 @@ public class PosteoController {
         return posteoRepository.findAll();
     }
 
-    /*
     @GetMapping(path = "/id") // Busca por pk compuesta
     public @ResponseBody Optional<Posteo> getPosteoByID(@RequestParam Long id_documento, String nombre_palabra) {
 
@@ -46,25 +54,8 @@ public class PosteoController {
         return posteo;
     }
 
-    @GetMapping(path = "/cantDoc")
-    public @ResponseBody Integer getCantidadDocumentosById(@RequestParam String nombre_palabra, int cantidadDocumentosTotales) {
-
-        int suma = 0;
-
-        PosteoPKId posteoPKId = new PosteoPKId();
-        posteoPKId.setNombre_palabra(nombre_palabra);
-
-        for (int i = 1; i < cantidadDocumentosTotales; i++) {
-            posteoPKId.setId((long) i);
-            if (posteoRepository.existsById(posteoPKId)) {
-                suma ++;
-            }
-        }
-        return suma;
-    }
-
     @DeleteMapping(path = "/delete") // Borra por pk compuesta
-    public void delete(@RequestParam Long id_documento, String nombre_palabra) {
+    public String delete(@RequestParam Long id_documento, String nombre_palabra) {
 
         PosteoPKId posteoPKId = new PosteoPKId();
         posteoPKId.setId(id_documento);
@@ -72,15 +63,15 @@ public class PosteoController {
 
         if (posteoRepository.existsById(posteoPKId)) {
             posteoRepository.deleteById(posteoPKId);
-            //return "Deleted";
+            return "Deleted";
         }
-        //else
-            //return "404 Not Found";
+        else
+            return "404 Not Found";
 
     }
 
     @PutMapping(path = "/updateFrecuencia")
-    public @ResponseBody void addFrecuenciaPosteo(@RequestParam Long id_documento, String nombre_palabra, Long frecuencia){
+    public @ResponseBody String addFrecuenciaPosteo(@RequestParam Long id_documento, String nombre_palabra, Long frecuencia){
         Posteo posteo = new Posteo();
         posteo.setId_documento(id_documento);
         posteo.setNombre_palabra(nombre_palabra);
@@ -95,17 +86,16 @@ public class PosteoController {
         }
         else
         {
-            //return "404 Not Found";
+            return "404 Not Found";
         }
 
         posteoRepository.saveAndFlush(posteo);
 
-        //return "Updated";
+        return "Updated";
     }
 
-    /*
     @PutMapping(path = "/updatePeso")
-    public @ResponseBody void addPesoPosteo(@RequestParam Long id_documento, String nombre_palabra, Long frecuencia, Double peso) {
+    public @ResponseBody String addPesoPosteo(@RequestParam Long id_documento, String nombre_palabra, Long frecuencia, Double peso) {
 
         Posteo posteo = new Posteo();
         posteo.setId_documento(id_documento);
@@ -122,14 +112,14 @@ public class PosteoController {
         }
         else
         {
-            //return "404 Not Found";
+            return "404 Not Found";
         }
 
         posteoRepository.saveAndFlush(posteo);
 
-        //return "Updated";
+        return "Updated";
+    }
 
-     */
 
 }
 
