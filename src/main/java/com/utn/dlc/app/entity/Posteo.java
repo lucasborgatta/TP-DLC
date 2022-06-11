@@ -18,20 +18,17 @@ import javax.persistence.*;
 public class Posteo {
 
     @Id
-    @Column(name = "id_documento")
-    private Long id_documento;
-
-    @Id
     @Column(name = "nombre_palabra")
     private String nombre_palabra;
+
+    @Column(name = "id_documento")
+    private Long id_documento;
 
     @Column(name = "frecuencia")
     private Long frecuencia;
 
-
-
     public Long getId_documento() {
-    return id_documento;
+        return id_documento;
     }
 
     public void setId_documento(Long id) {

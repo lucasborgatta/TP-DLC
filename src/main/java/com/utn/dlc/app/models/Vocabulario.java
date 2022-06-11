@@ -7,16 +7,15 @@ import java.util.Hashtable;
 
 public class Vocabulario {
 
+    /*
     public void setVocabulario() throws Exception {
-        String driver = "com.mysql.cj.jdbc.Driver";
-        String url = "jdbc:mysql://tpi-dlc.mysql.database.azure.com:3306/tpi?useSSL=false&serverTimezone=America/Argentina/Buenos_Aires";
-        Class.forName(driver).newInstance();
-        Connection connection = DriverManager.getConnection(url, "Programa", "Programa123456789");
         HashMap<String, ArrayList<Integer>> vocabulario;
-        vocabulario = getDatosVocabulario(connection);
+        vocabulario = getDatosVocabulario();
     }
+     */
 
-    public HashMap<String, ArrayList<Integer>> getDatosVocabulario(Connection connection) throws SQLException {
+    public HashMap<String, ArrayList<Integer>> getDatosVocabulario(Connection connection) throws SQLException, ClassNotFoundException, InstantiationException, IllegalAccessException {
+
         HashMap<String, ArrayList<Integer>> hash = new HashMap<>();
         String consulta = "select p.nombre_palabra, count(p.id_documento), max(p.frecuencia) from posteos p group by p.nombre_palabra";
         Statement statement = connection.createStatement();

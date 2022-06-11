@@ -3,12 +3,10 @@ package com.utn.dlc.app.controller;
 import com.utn.dlc.app.entity.Documento;
 import com.utn.dlc.app.repository.DocumentoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Optional;
 
 @Controller
@@ -27,16 +25,6 @@ public class DocumentoController {
 		documentoRepository.save(doc);
 		//return "Saved";
 	}
-
-	@PostMapping(path = "/add-all")
-	public ResponseEntity<List<Documento>> addAllDocument(List<Documento> documentos){
-		return new ResponseEntity<>(documentoRepository.saveAll(documentos), HttpStatus.OK);
-	}
-
-//	@GetMapping(path = "/skere")
-//	public ResponseEntity<List<Documento>> skere(Long id){
-//		return new ResponseEntity<>(documentoRepository.getDocumentoById(id), HttpStatus.OK);
-//	}
 
 	@GetMapping(path = "/all")
 	public @ResponseBody Iterable<Documento> getAllDocuments(){
@@ -57,7 +45,7 @@ public class DocumentoController {
 			//return "Deleted";
 		}
 		//else
-			//return "404 Not Found";
+		//return "404 Not Found";
 	}
 
 	@PutMapping(path = "/put")
@@ -68,6 +56,4 @@ public class DocumentoController {
 		documentoRepository.saveAndFlush(doc);
 		//return "Saved";
 	}
-
-
 }
