@@ -174,4 +174,49 @@ public class Index {
         return words;
 //        System.out.println(words);
     }
+
+    public void PostearunDocumento(Connection connection, File arch)throws IOException,SQLException{
+        File archivo = new File("C:\\» Universidad\\DLC\\TP\\src\\main\\resources\\static\\Files" + arch.getName());
+        int contadorDocumentos = 0;
+        ArrayList<String> stopWords = stopWords();
+        String linea;
+        String palabra;
+
+        BufferedReader br = new BufferedReader(new FileReader(archivo));
+
+        while ((linea = br.readLine()) != null) {
+
+            StringTokenizer st = new StringTokenizer(linea, " \n1234567890.,;:!?-_\"()[]{}\\¡¿#$%&/=-+|°¬@<>;'�\u0015~`\f\u0007\u001A\u001B\t\u0003\u0005\u000E\u001E\u0014^« ");
+
+            while (st.hasMoreTokens()) {
+
+                palabra = st.nextToken().toLowerCase(); // Pasamos todas las palabras a minuscula
+
+                if (!(palabra.length() == 1) && !palabra.equals(" ") && !palabra.equals("    ")) {
+                    if (!stopWords.contains(palabra)) { // Controlamos que la palabra no sea una stop word del diccionario
+
+                        // Guardamos en la hash map de los posteos
+                        // Si la hash map ya tenia la palabra, osea que aparecio en el documento entonces aumentamos en 1 el contador de frecuencias
+                        if (hashMapPosteoPorDocumento.containsKey(palabra)) {
+                            int contadorAux = hashMapPosteoPorDocumento.get(palabra);
+                            contadorAux++;
+                            hashMapPosteoPorDocumento.put(palabra, contadorAux);
+                        } else {
+                            // Si la hash map no tenia la palabra, la agregamos y ponemos el contador en 1
+                            hashMapPosteoPorDocumento.put(palabra, 1);
+                        }
+                    }
+                }
+            }
+        }
+        postearDocumentos(connection, contadorDocumentos, archivo.getName());
+
+        // Ahora si subimos el posteo de ese documento
+        postearPosteo(connection, contadorDocumentos, hashMapPosteoPorDocumento);
+
+        contadorDocumentos++;
+
+        // Limpiamos la hashmap para liberar memoria
+        hashMapPosteoPorDocumento.clear();
+    }
 }

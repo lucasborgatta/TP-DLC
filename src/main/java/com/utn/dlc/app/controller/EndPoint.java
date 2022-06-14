@@ -22,4 +22,18 @@ public class EndPoint {
         index.index(connection);
     }
 
+    @PostMapping(path = "/agregar/{nombreDoc}")
+    public @ResponseBody void Agregar(@PathParam("nombreDoc") String nombreDoc, File archivo) throws Exception{
+        Class.forName(this.driver).newInstance();
+        Connection connection = DriverManager.getConnection(this.url, "Lucas", null);
+        File arch = new File("C:\\» Universidad\\DLC\\TP\\src\\main\\resources\\static\\Files\\" + nombreDoc);
+        //if(arch.exists()){
+        //  return @ResponseStatus(code = );
+        //}
+        Index index= new Index();
+        index.PostearunDocumento(connection, arch);
+        buscador = new Buscador(connection);
+
+    }
+
 }
